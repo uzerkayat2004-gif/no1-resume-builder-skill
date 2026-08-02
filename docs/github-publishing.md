@@ -44,8 +44,8 @@ python
 
 ## Current release
 
-- Tag: `v1.2.0`
-- Title: `No. 1 Resume Builder Skill v1.2.0`
+- Tag: `v1.2.1`
+- Title: `No. 1 Resume Builder Skill v1.2.1`
 
 Suggested release summary:
 
@@ -53,9 +53,9 @@ Suggested release summary:
 
 Attach:
 
-- `no1-resume-builder-skill-v1.2.0.skill`
-- `no1-resume-builder-skill-v1.2.0-source.zip`
-- `no1-resume-builder-skill-v1.2.0-SHA256SUMS.txt`
+- `no1-resume-builder-skill-v1.2.1.skill`
+- `no1-resume-builder-skill-v1.2.1-source.zip`
+- `no1-resume-builder-skill-v1.2.1-SHA256SUMS.txt`
 
 ## Social preview
 
