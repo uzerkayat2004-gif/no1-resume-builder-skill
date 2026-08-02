@@ -51,9 +51,9 @@ The assistant prioritizes material facts:
 
 The user can build a reusable base resume or paste a specific job. When a job is supplied, the assistant maps requirements to supported, transferable, unsupported, or unclear evidence.
 
-### Step 5 — Draft, review, render
+### Step 5 — Build and render once
 
-The user receives a readable draft plus a fact-check list. Final DOCX/PDF rendering begins only after material claims are confirmed.
+After the user confirms the compact fact-and-assumption brief, the assistant writes, approves, renders, and verifies the final resume in one pass. It does not generate a labeled DOCX/PDF draft first unless the user explicitly requests a preview.
 
 ## Scratch path
 
@@ -77,13 +77,13 @@ Use the selected domain's prompts. Ask about the problem, personal action, metho
 
 Ask only for relevant education, licenses, certifications, tools, projects, languages, publications, or portfolio evidence.
 
-### Round 6 — First draft
+### Round 6 — Pre-build fact-check
 
-Draft when minimum viable evidence exists. Optional information can be added later.
+When minimum viable evidence exists, show the consolidated facts, target assumptions, sensitive details, and proposed omissions. Ask for confirmation before writing or rendering.
 
-### Round 7 — Fact-check and render
+### Round 7 — Build and render
 
-Confirm claims, gaps, sensitive details, and regional/domain assumptions. Render and verify.
+After confirmation, write, approve, render, and verify the final resume once. Optional information can be added later without forcing a preliminary document build.
 
 ## Question-batch design
 
@@ -108,9 +108,9 @@ Better:
 >
 > You can answer approximately or say “skip” to any item.
 
-## Minimum viable draft
+## Minimum viable fact set
 
-Draft when the assistant has:
+Ask for pre-build confirmation when the assistant has:
 
 - name and one safe contact;
 - target direction;

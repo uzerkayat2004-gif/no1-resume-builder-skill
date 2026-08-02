@@ -35,7 +35,8 @@ Read references/interaction-flow.md before a new build. Read references/privacy-
 - Offer "skip," "not sure," and "come back later"; never trap the user in a form.
 - Show a compact progress line after each intake round, such as "Target ✓ · Experience 2/3 · Education ✓ · Fact-check pending."
 - Save or update an intake-session JSON after each major phase when filesystem access is available. Keep that implementation detail out of the user's way.
-- Draft as soon as enough evidence exists. Do not make the user complete every optional section first.
+- As soon as enough evidence exists, show one compact pre-build confirmation brief. Do not write or render a downloadable resume until the candidate confirms the material facts, target assumptions, ownership, and omissions.
+- After confirmation, write, render, and verify the final resume in one pass. Do not create a labeled draft first unless the candidate explicitly asks for a preview.
 - Separate working questions from final resume content. Never leave placeholders in a final document.
 
 Use the session helper when useful:
@@ -48,16 +49,17 @@ Use the session helper when useful:
 
 1. Extract the document locally. Support PDF, DOCX, TXT, and Markdown.
 2. Check whether the PDF contains selectable text and whether extraction order is logical.
-3. Present an import summary before rewriting:
+3. Present an import summary and confirmation brief before rewriting:
    - sections and roles found;
    - dates or text that are ambiguous;
    - important content that may not have extracted;
    - sensitive or outdated information;
    - missing target role, market, or job posting.
 4. Convert the extracted content into the canonical career record in schemas/career-record.schema.json.
-5. Treat "verified" as faithfully supported by a supplied source, not independently background-checked truth. Ask the candidate to confirm material dates, metrics, scope, credentials, and changed wording.
-6. Preserve useful history in the master record even when it is omitted from a targeted version.
-7. Never overwrite the uploaded resume.
+5. Treat "verified" as faithfully supported by a supplied source, not independently background-checked truth. Before writing, ask the candidate to confirm material dates, metrics, scope, credentials, personal ownership, target role/market, contact details, and proposed omissions.
+6. Group that confirmation into at most three questions. A simple “Everything above is correct” response is sufficient when no corrections are needed.
+7. After confirmation, preserve useful history in the master record even when it is omitted from a targeted version, then write and render once.
+8. Never overwrite the uploaded resume.
 
 For an unreadable or scanned file, explain the limitation and ask for DOCX, selectable PDF, pasted text, or permission to use OCR if an OCR tool is available.
 
@@ -70,7 +72,7 @@ Guide the user through these rounds:
 3. Timeline: current or most recent role first, then earlier relevant work.
 4. Evidence stories: contributions, problems solved, methods, scope, and outcomes.
 5. Qualifications: education, licenses, certifications, skills, languages, projects, publications, volunteering, or portfolios as relevant.
-6. Review: confirm dates, ownership, metrics, sensitive details, and omissions.
+6. Pre-build confirmation: show the consolidated facts and assumptions, then confirm dates, ownership, metrics, sensitive details, target, and omissions before writing or rendering.
 
 Do not ask "What are your achievements?" as the only prompt. Use domain-specific memory questions, for example:
 
@@ -111,17 +113,17 @@ Read references/core-principles.md.
 3. Quantify only when the candidate supplies or confirms the number.
 4. Accept meaningful non-numeric evidence: quality, safety, reliability, complexity, trust, adoption, completion, stakeholder decision, customer outcome, or risk reduction.
 5. Surface conflicting sources instead of silently choosing one.
-6. Rendering must stop on unsupported final claims. Use meta.allowUnverified only for a visibly marked working draft.
+6. Rendering must stop on unsupported final claims. Use `meta.allowUnverified` only when the candidate explicitly requests a preview before confirmation; set `meta.previewRequested` to record that request. Never use a rendered draft as the routine workflow.
 
 Validate before rendering:
 
     python scripts/resume_tool.py validate RECORD.json
 
-After the candidate reviews every material fact and exact wording, bind that approval before final rendering:
+After the candidate reviews the material facts, target assumptions, ownership, sensitive details, and omissions, write the fact-preserving resume wording and bind it before the first render:
 
     python scripts/resume_tool.py approve private/draft.career-record.json --out private/approved.career-record.json
 
-The approval digests make later changes to identity, employers, titles, dates, summaries, skills, and accomplishments fail validation. Never run approval without the candidate's explicit fact review.
+The approval digests make later changes to identity, employers, titles, dates, summaries, skills, and accomplishments fail validation. Never run approval without the candidate's explicit fact review. Ordinary clarity edits do not require a second user review when they preserve the confirmed meaning; ask again before rendering only if wording changes ownership, seniority, scope, or introduces a new material fact.
 
 ## Model the target job
 
@@ -155,20 +157,22 @@ Write concise accomplishment statements using this flexible shape:
 
 Do not force every bullet into the same formula. Preserve natural voice and distinguish personal ownership from team results.
 
-## Review before final output
+## Confirm before writing or rendering
 
-Show:
+Once enough evidence exists, show one compact confirmation brief containing:
 
 - facts or metrics needing confirmation;
 - sensitive data found;
 - unsupported or unclear job requirements;
 - regional and domain assumptions;
 - proposed omissions;
-- wording that changes apparent ownership or seniority.
+- any proposed wording direction that could change apparent ownership or seniority.
 
-Require confirmation for new or materially changed factual claims. Stylistic edits that preserve meaning do not need item-by-item approval.
+Ask at most three grouped questions and wait. Do not spend time laying out DOCX/PDF files at this stage. If the candidate confirms everything, create the final wording, bind approval, render, and verify in one pass. If corrections are supplied, apply them before that single build. Stylistic edits that preserve meaning do not need item-by-item approval.
 
 ## Render and verify
+
+Render only after the pre-build confirmation, except when the candidate explicitly requests a visibly marked preview. The normal path produces submission-ready files without a draft banner.
 
 Default application set:
 

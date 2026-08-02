@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.3.0 — 2026-08-02
+
+- Moved material-fact, target, ownership, contact, and omission confirmation before resume writing and rendering.
+- Changed the normal workflow to produce the final resume once instead of rendering a labeled draft and rebuilding it.
+- Kept marked previews as an explicit candidate-requested exception and added a validation gate for that consent.
+- Updated the interaction guidance, user journey, evaluation set, schemas, and regression suite.
+
 ## 1.2.1 — 2026-08-02
 
 - Fixed DOCX metadata scrubbing so generated resumes remain compatible with Microsoft Word.

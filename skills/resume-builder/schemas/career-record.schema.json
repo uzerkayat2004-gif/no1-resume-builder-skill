@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:resume-builder:career-record:1.2.0",
+  "$id": "urn:resume-builder:career-record:1.3.0",
   "title": "Evidence-backed career record",
   "type": "object",
   "required": ["basics", "evidence"],
@@ -209,6 +209,7 @@
         "region": {"type": "string"},
         "paperSize": {"enum": ["letter", "a4"]},
         "allowUnverified": {"type": "boolean"},
+        "previewRequested": {"type": "boolean"},
         "approvedClaimDigests": {
           "type": "object",
           "additionalProperties": {

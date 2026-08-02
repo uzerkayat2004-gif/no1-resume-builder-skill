@@ -88,6 +88,17 @@
         "The candidate can override the router.",
         "The resume is still evidence-based and target-specific."
       ]
+    },
+    {
+      "id": 9,
+      "prompt": "Redesign my uploaded product resume. It contains dates, percentages, project test counts, and several possible target roles. Keep this fast: confirm the important assumptions with me before generating any resume files, then build the final DOCX and PDF once.",
+      "expected_output": "The first build response presents a compact import and assumption brief, asks no more than three grouped confirmation questions, and does not render a labeled draft. After confirmation, it creates submission-ready files in one pass.",
+      "files": [],
+      "assertions": [
+        "No DOCX or PDF is rendered before the candidate confirms material facts and target assumptions.",
+        "The confirmation request groups dates, metrics, ownership, target, contact details, and omissions into no more than three questions.",
+        "The normal post-confirmation output has no draft banner or draft filename."
+      ]
     }
   ]
 }
