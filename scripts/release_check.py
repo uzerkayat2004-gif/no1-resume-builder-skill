@@ -127,20 +127,38 @@ def main() -> int:
         except json.JSONDecodeError as exc:
             failures.append(f"Invalid JSON in {path.relative_to(ROOT)}: {exc}")
 
-    expected_requirements = {
-        "python-docx==1.2.0",
-        "reportlab==4.5.1",
-        "pypdf==6.14.2",
-    }
-    for path in (ROOT / "requirements.txt", SKILL / "requirements.txt"):
-        installed = {
+    requirement_paths = (ROOT / "requirements.txt", SKILL / "requirements.txt")
+    requirement_sets = [
+        {
             line.strip()
             for line in path.read_text(encoding="utf-8").splitlines()
             if line.strip() and not line.startswith("#")
         }
+        for path in requirement_paths
+    ]
+    check(
+        requirement_sets[0] == requirement_sets[1],
+        "Root and runtime dependency pins must match.",
+        failures,
+    )
+    pins: dict[str, tuple[int, ...]] = {}
+    for requirement in requirement_sets[0]:
+        match = re.fullmatch(r"([a-z0-9-]+)==([0-9]+(?:\.[0-9]+)*)", requirement)
+        check(bool(match), f"Runtime dependency must use an exact pin: {requirement}", failures)
+        if match:
+            pins[match.group(1)] = tuple(int(part) for part in match.group(2).split("."))
+    check(set(pins) == {"python-docx", "reportlab", "pypdf"}, "Unexpected runtime dependency set.", failures)
+    minimums = {
+        "python-docx": (1, 2, 0),
+        "reportlab": (4, 5, 1),
+        "pypdf": (6, 14, 2),
+    }
+    maximum_majors = {"python-docx": 2, "reportlab": 5, "pypdf": 7}
+    for name, minimum in minimums.items():
+        version = pins.get(name, ())
         check(
-            installed == expected_requirements,
-            f"Dependency pins changed without updating the security baseline: {path}",
+            version >= minimum and bool(version) and version[0] < maximum_majors[name],
+            f"{name} must remain within the reviewed, patched major-version range.",
             failures,
         )
 
