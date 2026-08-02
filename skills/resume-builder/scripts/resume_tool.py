@@ -3,7 +3,7 @@
 
 This module deliberately performs no network calls. It treats the JSON career
 record as the source of truth and blocks material claims that are unsupported
-or marked unverified unless a record explicitly opts into an unverified draft.
+or marked unverified unless the candidate explicitly requested a preview.
 """
 
 from __future__ import annotations
@@ -289,6 +289,8 @@ def _structure_errors(record: Any) -> list[str]:
     check_fields(meta, "meta", ("language", "region", "paperSize", "version", "lastModified"))
     if "allowUnverified" in meta and not isinstance(meta["allowUnverified"], bool):
         errors.append("meta.allowUnverified must be a boolean.")
+    if "previewRequested" in meta and not isinstance(meta["previewRequested"], bool):
+        errors.append("meta.previewRequested must be a boolean.")
     digests = meta.get("approvedClaimDigests", {})
     if not isinstance(digests, dict) or not all(
         isinstance(key, str) and isinstance(value, str)
@@ -350,6 +352,12 @@ def validate_record(
 
     meta = record.get("meta", {})
     allow_unverified = bool(meta.get("allowUnverified", False))
+    preview_requested = bool(meta.get("previewRequested", False))
+    if allow_unverified and not preview_requested:
+        errors.append(
+            "Unverified rendering requires an explicit candidate preview request; "
+            "set meta.previewRequested only after that request."
+        )
     approved_digests = meta.get("approvedClaimDigests", {})
     used_evidence: set[str] = set()
     for location, claim_ids, text in _claim_refs(record):
@@ -390,7 +398,7 @@ def validate_record(
 
     if allow_unverified:
         warnings.append(
-            "This is an unverified draft. Every output will be visibly marked and must not be submitted."
+            "This candidate-requested preview is unverified. Every output will be visibly marked and must not be submitted."
         )
 
     for section in ("work", "projects"):
@@ -464,7 +472,9 @@ def validate_record(
 def approve_record(record: dict[str, Any]) -> dict[str, Any]:
     """Create no-drift approval digests after the candidate confirms every fact."""
     candidate = copy.deepcopy(record)
-    candidate.setdefault("meta", {})["allowUnverified"] = False
+    meta = candidate.setdefault("meta", {})
+    meta["allowUnverified"] = False
+    meta["previewRequested"] = False
     report = validate_record(candidate, require_approval=False)
     if not report["valid"]:
         raise ValueError(
@@ -1587,7 +1597,7 @@ def new_intake_session(
 
     now = _utc_now()
     session: dict[str, Any] = {
-        "version": "1.2.0",
+        "version": "1.3.0",
         "sessionId": str(uuid.uuid4()),
         "journey": journey,
         "status": "intake",
@@ -1733,7 +1743,7 @@ def next_intake_questions(session: dict[str, Any], limit: int = 3) -> list[dict[
         extracted_count = sum(item.get("extractedCharacters", 0) for item in sources)
         add(
             "source.confirm",
-            f"I extracted {extracted_count} characters. Is this your latest reliable career history, and are any sections outdated?",
+            f"I extracted {extracted_count} characters. Before I write or render anything, please confirm or correct the imported roles, dates, metrics, credentials, and what you personally owned.",
         )
         add(
             "source.exclude",
@@ -1795,7 +1805,7 @@ def next_intake_questions(session: dict[str, Any], limit: int = 3) -> list[dict[
     ):
         add(
             "review.confirm",
-            "Before I render the final files, would you like to review the fact-check list and unsupported job requirements?",
+            "Please confirm the consolidated facts, target assumptions, contact details, and omissions. Once confirmed, I will write and render the final files in one pass.",
         )
     return questions[:limit]
 

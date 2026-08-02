@@ -15,7 +15,7 @@
 - Scratch journey asks no more than three questions at once.
 - Both journeys create resumable checkpoints.
 - An incomplete user can skip and resume.
-- The minimum viable draft gate works.
+- The minimum viable fact-set and pre-build confirmation gates work.
 
 ## Domains
 

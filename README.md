@@ -61,15 +61,14 @@ flowchart LR
     A["Start Resume Builder"] --> B{"Do you have a resume?"}
     B -->|"Yes"| C["Import PDF, DOCX, TXT, or Markdown"]
     C --> D["Show extraction and uncertainties"]
-    D --> E["Confirm facts and target"]
+    D --> E["Show compact fact-and-assumption brief"]
     B -->|"No"| F["Short guided interview"]
     F --> G["Capture target, timeline, and evidence"]
-    E --> H["Build private career record"]
+    E --> H["Candidate confirms material facts, target, and omissions"]
     G --> H
-    H --> I["Create base or job-tailored resume"]
+    H --> I["Build approved base or job-tailored resume once"]
     I --> J["Validate claims and numeric evidence"]
-    J --> K["Candidate approves exact facts and wording"]
-    K --> M["Render and inspect DOCX/PDF/TXT"]
+    J --> M["Render and inspect DOCX/PDF/TXT"]
     M --> L["Create evidence-linked interview practice"]
 ```
 
@@ -88,7 +87,7 @@ The skill:
 
 ### Path B: Start from scratch
 
-The skill asks no more than three questions per round. A person can answer in rough notes, say “skip,” say “not sure,” or return later. It drafts as soon as enough real evidence exists instead of forcing the person through a long form.
+The skill asks no more than three questions per round. A person can answer in rough notes, say “skip,” say “not sure,” or return later. Once enough real evidence exists, it asks for one compact confirmation before writing or rendering, then produces the final resume once. A labeled preview is created only when the person explicitly requests one.
 
 Typical progress:
 
@@ -190,11 +189,13 @@ See [Tested examples](docs/tested-examples.md) and [evaluation prompts](evals/ev
 
 ## Validation performed
 
-- 19 deterministic automated tests pass.
+- 21 deterministic automated tests pass.
 - Unsupported or unverified final claims are blocked.
 - Numeric detail must appear in cited evidence.
 - Old-resume import does not overwrite the source.
 - Intake batches contain no more than three questions.
+- Final resume rendering is blocked until the candidate confirms the material facts.
+- An unverified preview requires an explicit candidate request.
 - DOCX and PDF are generated without layout tables.
 - The synthetic DOCX and PDF passed visual inspection.
 - Both demonstration files preserved all 200 expected material tokens during extraction.
@@ -244,7 +245,7 @@ Validate, render and verify:
 python skills/resume-builder/scripts/resume_tool.py validate \
   skills/resume-builder/examples/sample-career-record.json
 
-# For a candidate's own draft, run this only after they confirm every material fact:
+# For a candidate's resume, run this only after they confirm every material fact:
 python skills/resume-builder/scripts/resume_tool.py approve \
   private/draft.career-record.json \
   --out private/approved.career-record.json

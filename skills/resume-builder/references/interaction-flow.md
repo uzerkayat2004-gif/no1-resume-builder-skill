@@ -8,7 +8,7 @@ Use this reference for every new resume build.
 - [Opening router](#opening-router)
 - [Path A — existing resume](#path-a--existing-resume)
 - [Path B — scratch](#path-b--scratch)
-- [Minimum viable draft](#minimum-viable-draft)
+- [Minimum viable fact set](#minimum-viable-fact-set)
 - [Progress states](#progress-states)
 - [Recovery](#recovery)
 
@@ -21,7 +21,8 @@ The user should feel as though they are talking with a patient career coach, not
 - Reuse uploaded information and earlier answers.
 - Explain progress in plain language.
 - Let the user skip, correct, or return to anything.
-- Draft once minimum viable evidence exists, then improve through review.
+- Once minimum viable evidence exists, show a compact fact-and-assumption brief and ask for confirmation before writing or rendering.
+- After confirmation, produce the final resume once. Do not create a downloadable draft by default.
 - Keep JSON, schemas, and command details behind the scenes unless the user wants them.
 
 ## Opening router
@@ -57,21 +58,24 @@ Ask only what is missing:
 - In which country or market?
 - Is there a specific job posting?
 
-### A3. Confirm imported facts
+### A3. Confirm imported facts before building
 
-Prioritize confirmation of:
+Show the material facts in a compact, readable brief, then prioritize confirmation of:
 
 - current title and employer;
 - employment dates;
 - numbers, budgets, team sizes, volumes, or percentages;
 - credentials and licenses;
-- personal ownership versus team outcomes.
+- personal ownership versus team outcomes;
+- target role and market;
+- contact details to retain;
+- sensitive details and proposed omissions.
 
-Do not make the user reconfirm every harmless phrase.
+Group the confirmation into at most three questions. Let the user reply “Everything above is correct” or provide corrections. Do not make the user reconfirm every harmless phrase, and do not generate a DOCX or PDF while this confirmation is pending.
 
 ### A4. Improve or tailor
 
-Create the master career record, route the domain, build the requirement matrix when a job is supplied, and produce the first draft.
+After confirmation, create the master career record, route the domain, build the requirement matrix when a job is supplied, write the final resume, bind approval, render, and verify it in one pass.
 
 ## Path B — scratch
 
@@ -133,13 +137,17 @@ Ask only about sections relevant to the target:
 - languages;
 - awards or professional service.
 
-### B6. First draft and review
+### B6. Pre-build confirmation
 
-Build a draft and show a fact-check list. Ask the user to correct meaning, not formatting minutiae. Then render after material facts are confirmed.
+Show a consolidated fact-and-assumption brief. Ask the user to correct meaning, dates, ownership, metrics, target, sensitive details, and omissions—not formatting minutiae. Wait for confirmation before writing or rendering.
 
-## Minimum viable draft
+### B7. Build once
 
-A private-sector first draft normally needs:
+After confirmation, write, bind approval, render, and verify the final resume in one pass.
+
+## Minimum viable fact set
+
+A private-sector confirmation brief normally needs:
 
 - name and one contact method;
 - target role or professional direction;
@@ -147,7 +155,11 @@ A private-sector first draft normally needs:
 - at least two supported evidence statements;
 - enough dates or context to avoid misleading chronology.
 
-If these exist, draft. Label remaining questions separately.
+If these exist, ask for confirmation. Label optional remaining questions separately; they must not force an unnecessary draft-and-rebuild cycle.
+
+## Explicit preview exception
+
+If the candidate explicitly asks to see a resume preview before confirming facts, a visibly marked non-submittable preview is allowed. Record that request with `meta.previewRequested`. Do not offer or render this preview by default.
 
 ## Progress states
 

@@ -44,18 +44,18 @@ python
 
 ## Current release
 
-- Tag: `v1.2.1`
-- Title: `No. 1 Resume Builder Skill v1.2.1`
+- Tag: `v1.3.0`
+- Title: `No. 1 Resume Builder Skill v1.3.0`
 
 Suggested release summary:
 
-> Hardened release of the evidence-first Resume Builder Codex skill. Adds candidate-approval binding, unmistakable draft output, untrusted-document protections, privacy-minimized import sessions, safe input limits, patched dependency pins, metadata scrubbing, and expanded adversarial tests.
+> Faster confirmation-first release of the evidence-first Resume Builder Codex skill. It confirms material facts and assumptions before layout, then writes and renders the final resume once. Marked previews remain available only when the candidate explicitly requests one.
 
 Attach:
 
-- `no1-resume-builder-skill-v1.2.1.skill`
-- `no1-resume-builder-skill-v1.2.1-source.zip`
-- `no1-resume-builder-skill-v1.2.1-SHA256SUMS.txt`
+- `no1-resume-builder-skill-v1.3.0.skill`
+- `no1-resume-builder-skill-v1.3.0-source.zip`
+- `no1-resume-builder-skill-v1.3.0-SHA256SUMS.txt`
 
 ## Social preview
 
