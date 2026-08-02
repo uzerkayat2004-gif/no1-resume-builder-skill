@@ -1,0 +1,30 @@
+name: Bug report
+description: Report incorrect behavior without sharing private resume data
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not attach a real resume or intake session. Use a redacted or synthetic reproduction.
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include the command, prompt, or workflow step.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect?
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Safe reproduction
+      description: Provide synthetic or fully redacted data only.
+    validations:
+      required: true
+

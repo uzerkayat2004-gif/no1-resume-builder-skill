@@ -1,0 +1,198 @@
+{
+  "version": "1.0.0",
+  "fallback": {
+    "id": "general",
+    "label": "General or emerging occupation",
+    "profile": "general.md",
+    "evidencePrompts": [
+      "What does a strong performer in this work deliver?",
+      "What problems, people, tools, standards, or risks define the work?",
+      "What became better because of your contribution?"
+    ]
+  },
+  "domains": [
+    {
+      "id": "technology-software",
+      "label": "Software engineering and cloud",
+      "profile": "technology-data-security.md",
+      "keywords": ["software engineer", "software developer", "backend", "front end", "frontend", "full stack", "mobile developer", "web developer", "devops", "site reliability", "sre", "cloud engineer", "qa engineer", "test automation", "platform engineer"],
+      "evidencePrompts": ["What system or feature did you build or change, and what constraint mattered?", "What did you improve in reliability, latency, quality, security, cost, or developer experience?"]
+    },
+    {
+      "id": "data-ai-analytics",
+      "label": "Data, AI, and analytics",
+      "profile": "technology-data-security.md",
+      "keywords": ["data analyst", "business analyst", "data scientist", "machine learning", "artificial intelligence", "analytics", "business intelligence", "bi analyst", "data engineer", "statistician", "research analyst"],
+      "evidencePrompts": ["What decision changed because of your analysis?", "How did you improve data quality, model performance, reporting, experimentation, or insight delivery?"]
+    },
+    {
+      "id": "cybersecurity-it",
+      "label": "Cybersecurity and IT",
+      "profile": "technology-data-security.md",
+      "keywords": ["cybersecurity", "security analyst", "soc analyst", "information security", "network engineer", "system administrator", "systems administrator", "it support", "help desk", "infrastructure", "cloud security", "incident response"],
+      "evidencePrompts": ["What incident, risk, control, or reliability problem did you handle?", "What environment, standards, tools, and response responsibilities were involved?"]
+    },
+    {
+      "id": "product-management",
+      "label": "Product management",
+      "profile": "product-project-design.md",
+      "keywords": ["product manager", "product owner", "product lead", "product analyst", "growth product", "product operations"],
+      "evidencePrompts": ["What customer or business problem did you prioritize, and why?", "What discovery, experiment, roadmap, launch, or adoption evidence shows your contribution?"]
+    },
+    {
+      "id": "project-program-management",
+      "label": "Project and program management",
+      "profile": "product-project-design.md",
+      "keywords": ["project manager", "program manager", "program coordinator", "pmo", "scrum master", "delivery manager", "implementation manager"],
+      "evidencePrompts": ["What program or delivery did you coordinate, and what dependencies or risks did you manage?", "How did schedule, budget, quality, scope, or stakeholder alignment change?"]
+    },
+    {
+      "id": "design-creative",
+      "label": "Design and creative",
+      "profile": "product-project-design.md",
+      "keywords": ["ux designer", "ui designer", "product designer", "graphic designer", "visual designer", "content designer", "creative director", "illustrator", "motion designer", "copywriter"],
+      "evidencePrompts": ["What user or communication problem did the work solve?", "What research, iteration, accessibility, craft, or portfolio evidence supports the outcome?"]
+    },
+    {
+      "id": "marketing-communications",
+      "label": "Marketing and communications",
+      "profile": "business-go-to-market.md",
+      "keywords": ["marketing", "growth marketer", "digital marketing", "seo", "content marketing", "communications", "public relations", "brand manager", "social media", "campaign manager"],
+      "evidencePrompts": ["What audience and goal did the campaign address?", "What changed in reach, engagement, qualified demand, conversion, reputation, or message clarity?"]
+    },
+    {
+      "id": "sales-business-development",
+      "label": "Sales and business development",
+      "profile": "business-go-to-market.md",
+      "keywords": ["sales", "account executive", "business development", "relationship manager", "sales development", "partnerships", "commercial manager", "territory manager"],
+      "evidencePrompts": ["What market, account type, territory, or sales motion did you own?", "What evidence shows pipeline quality, revenue, retention, expansion, negotiation, or relationship depth?"]
+    },
+    {
+      "id": "customer-success-support",
+      "label": "Customer success and support",
+      "profile": "business-go-to-market.md",
+      "keywords": ["customer success", "customer support", "client success", "account manager", "technical support", "service desk", "customer experience", "implementation consultant"],
+      "evidencePrompts": ["What customer problem or adoption barrier did you resolve?", "What shows retention, satisfaction, resolution quality, response, expansion, or process improvement?"]
+    },
+    {
+      "id": "finance-accounting",
+      "label": "Finance and accounting",
+      "profile": "finance-consulting-legal.md",
+      "keywords": ["accountant", "financial analyst", "fp&a", "finance manager", "controller", "auditor", "tax", "treasury", "bookkeeper", "accounts payable", "accounts receivable"],
+      "evidencePrompts": ["What financial decision, close, control, forecast, or analysis did you support?", "What scale, accuracy, timeliness, compliance, savings, or risk evidence can you confirm?"]
+    },
+    {
+      "id": "banking-investment",
+      "label": "Banking and investment",
+      "profile": "finance-consulting-legal.md",
+      "keywords": ["investment banking", "private equity", "venture capital", "equity research", "credit analyst", "portfolio manager", "wealth management", "corporate banking", "trader"],
+      "evidencePrompts": ["What transaction, portfolio, research, diligence, or client work did you contribute to?", "What size, sector, model, thesis, risk, or decision can be described without breaching confidentiality?"]
+    },
+    {
+      "id": "consulting-strategy",
+      "label": "Consulting and strategy",
+      "profile": "finance-consulting-legal.md",
+      "keywords": ["consultant", "strategy", "management consulting", "business consultant", "transformation", "advisory", "corporate strategy"],
+      "evidencePrompts": ["What ambiguous problem did you structure and solve?", "What analysis, recommendation, implementation, stakeholder, or decision outcome followed?"]
+    },
+    {
+      "id": "legal-compliance-policy",
+      "label": "Legal, compliance, and policy",
+      "profile": "finance-consulting-legal.md",
+      "keywords": ["lawyer", "attorney", "paralegal", "legal counsel", "compliance", "risk manager", "policy analyst", "regulatory", "governance", "privacy officer", "contract manager"],
+      "evidencePrompts": ["What matter, regulation, contract, investigation, or policy did you handle?", "What jurisdiction, risk, analysis, negotiation, control, or outcome can be stated appropriately?"]
+    },
+    {
+      "id": "operations-supply-chain",
+      "label": "Operations, supply chain, and logistics",
+      "profile": "operations-industrial-trades.md",
+      "keywords": ["operations manager", "operations analyst", "supply chain", "procurement", "purchasing", "logistics", "warehouse", "inventory", "transportation", "fleet manager", "demand planner"],
+      "evidencePrompts": ["What flow of people, materials, orders, inventory, or service did you improve?", "What evidence shows throughput, reliability, cost, quality, safety, delivery, or supplier performance?"]
+    },
+    {
+      "id": "manufacturing-engineering-quality",
+      "label": "Manufacturing, engineering, and quality",
+      "profile": "operations-industrial-trades.md",
+      "keywords": ["mechanical engineer", "electrical engineer", "civil engineer", "manufacturing engineer", "industrial engineer", "quality engineer", "plant manager", "production supervisor", "maintenance engineer", "process engineer"],
+      "evidencePrompts": ["What process, equipment, design, production, or quality problem did you solve?", "Which standards, tolerances, safety constraints, reliability measures, or production results applied?"]
+    },
+    {
+      "id": "construction-trades-field-service",
+      "label": "Construction, skilled trades, and field service",
+      "profile": "operations-industrial-trades.md",
+      "keywords": ["construction", "electrician", "plumber", "welder", "carpenter", "technician", "field service", "hvac", "mechanic", "site supervisor", "foreman", "quantity surveyor"],
+      "evidencePrompts": ["What projects, systems, equipment, or sites did you work on?", "What licenses, safety practices, diagnostics, workmanship, schedule, or customer evidence shows your capability?"]
+    },
+    {
+      "id": "clinical-healthcare",
+      "label": "Clinical healthcare",
+      "profile": "healthcare-life-sciences.md",
+      "keywords": ["nurse", "registered nurse", "physician", "doctor", "medical assistant", "physiotherapist", "physical therapist", "occupational therapist", "pharmacist", "radiographer", "dentist", "clinical"],
+      "evidencePrompts": ["What patient population, setting, acuity, or clinical responsibility did you handle?", "What evidence shows safety, care quality, coordination, education, documentation, or improvement without exposing patient information?"]
+    },
+    {
+      "id": "public-health-social-care",
+      "label": "Public health and social care",
+      "profile": "healthcare-life-sciences.md",
+      "keywords": ["public health", "social worker", "case manager", "community health", "mental health", "counselor", "care coordinator", "health educator"],
+      "evidencePrompts": ["What population, caseload, program, or safeguarding responsibility did you support?", "What shows access, continuity, engagement, coordination, prevention, or community outcome?"]
+    },
+    {
+      "id": "pharma-biotech-life-sciences",
+      "label": "Pharma, biotech, and life sciences",
+      "profile": "healthcare-life-sciences.md",
+      "keywords": ["pharmaceutical", "biotech", "life sciences", "clinical research", "clinical trial", "laboratory", "research scientist", "regulatory affairs", "medical affairs", "quality assurance pharma"],
+      "evidencePrompts": ["What study, assay, product, submission, quality system, or scientific problem did you work on?", "What methods, regulations, reproducibility, documentation, or milestone evidence applies?"]
+    },
+    {
+      "id": "education-training",
+      "label": "Education and training",
+      "profile": "education-research.md",
+      "keywords": ["teacher", "educator", "lecturer", "trainer", "instructional designer", "school counselor", "curriculum", "learning and development", "tutor", "professor"],
+      "evidencePrompts": ["Who learned what because of your teaching or design?", "What evidence shows learner progress, inclusion, engagement, curriculum quality, assessment, or program improvement?"]
+    },
+    {
+      "id": "academic-research",
+      "label": "Academic and research",
+      "profile": "education-research.md",
+      "keywords": ["researcher", "research fellow", "postdoctoral", "postdoc", "phd", "academic", "faculty", "professor", "scientist", "research assistant"],
+      "evidencePrompts": ["What research question, method, dataset, experiment, or contribution did you own?", "What publication, grant, presentation, teaching, collaboration, reproducibility, or impact evidence is verified?"]
+    },
+    {
+      "id": "government-public-sector",
+      "label": "Government and public sector",
+      "profile": "public-sector-nonprofit.md",
+      "keywords": ["government", "public sector", "civil service", "public administration", "policy officer", "municipal", "federal", "state government", "local government", "public servant"],
+      "evidencePrompts": ["What public outcome, service, policy, casework, or statutory responsibility did you support?", "What shows compliance, stewardship, access, timeliness, stakeholder trust, or measurable service improvement?"]
+    },
+    {
+      "id": "nonprofit-social-impact",
+      "label": "Nonprofit and social impact",
+      "profile": "public-sector-nonprofit.md",
+      "keywords": ["nonprofit", "ngo", "charity", "social impact", "community organizer", "fundraising", "development officer", "program officer", "humanitarian"],
+      "evidencePrompts": ["What community need, program, campaign, partnership, or funding goal did you address?", "What shows reach, service quality, participation, funding, sustainability, or beneficiary outcome?"]
+    },
+    {
+      "id": "retail-hospitality-service",
+      "label": "Retail, hospitality, and service",
+      "profile": "service-hospitality-administration.md",
+      "keywords": ["retail", "store manager", "sales associate", "hospitality", "hotel", "restaurant", "chef", "cook", "server", "front desk", "housekeeping", "guest service", "barista"],
+      "evidencePrompts": ["What customer, guest, service, or shift responsibility did you own?", "What shows service quality, sales, speed, hygiene, safety, teamwork, training, or repeat business?"]
+    },
+    {
+      "id": "administrative-office",
+      "label": "Administrative and office support",
+      "profile": "service-hospitality-administration.md",
+      "keywords": ["administrative assistant", "executive assistant", "office manager", "receptionist", "coordinator", "secretary", "data entry", "virtual assistant"],
+      "evidencePrompts": ["What people, schedules, records, communications, or processes did you keep running?", "What shows accuracy, discretion, responsiveness, organization, time saved, or stakeholder trust?"]
+    },
+    {
+      "id": "executive-leadership",
+      "label": "Executive and enterprise leadership",
+      "profile": "executive-leadership.md",
+      "keywords": ["chief executive", "ceo", "chief operating", "coo", "chief financial", "cfo", "chief technology", "cto", "vice president", "vp ", "managing director", "general manager", "executive director", "founder"],
+      "evidencePrompts": ["What enterprise decision, operating model, portfolio, or transformation did you lead?", "What verified scope and durable outcomes show leadership across strategy, people, governance, and execution?"]
+    }
+  ]
+}
+

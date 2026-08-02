@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:resume-builder:intake-session:1.0.0",
+  "title": "Resume Builder intake session",
+  "type": "object",
+  "required": [
+    "version",
+    "sessionId",
+    "journey",
+    "status",
+    "target",
+    "candidate",
+    "sources",
+    "answers",
+    "nextQuestions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "version": {"type": "string"},
+    "sessionId": {"type": "string"},
+    "journey": {"enum": ["existing-resume", "scratch"]},
+    "status": {
+      "enum": ["intake", "drafting", "fact-check", "ready-to-render", "complete"]
+    },
+    "createdAt": {"type": "string"},
+    "updatedAt": {"type": "string"},
+    "privacyNotice": {"type": "string"},
+    "target": {
+      "type": "object",
+      "required": [
+        "role",
+        "region",
+        "jobDescription",
+        "domain",
+        "domainConfidence",
+        "domainNeedsConfirmation"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "role": {"type": "string"},
+        "region": {"type": "string"},
+        "jobDescription": {"type": "string"},
+        "domain": {
+          "type": "object",
+          "required": ["id", "label", "profile"],
+          "additionalProperties": true,
+          "properties": {
+            "id": {"type": "string"},
+            "label": {"type": "string"},
+            "profile": {"type": "string"},
+            "score": {"type": ["integer", "null"]},
+            "matchedKeywords": {
+              "type": "array",
+              "items": {"type": "string"}
+            },
+            "evidencePrompts": {
+              "type": "array",
+              "items": {"type": "string"}
+            }
+          }
+        },
+        "domainConfidence": {"type": "string"},
+        "domainNeedsConfirmation": {"type": "boolean"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "required": ["name", "email", "phone", "location", "profiles"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "email": {"type": "string"},
+        "phone": {"type": "string"},
+        "location": {"type": "string"},
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["network", "url"],
+            "additionalProperties": false,
+            "properties": {
+              "network": {"type": "string"},
+              "url": {"type": "string"}
+            }
+          }
+        }
+      }
+    },
+    "sources": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "path",
+          "fileName",
+          "fileType",
+          "sha256",
+          "extractedCharacters",
+          "textSelectable",
+          "extractedText",
+          "reviewedByUser"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "path": {"type": "string"},
+          "fileName": {"type": "string"},
+          "fileType": {"type": "string"},
+          "sha256": {"type": "string"},
+          "extractedCharacters": {"type": "integer", "minimum": 0},
+          "textSelectable": {"type": "boolean"},
+          "extractedText": {"type": "string"},
+          "reviewedByUser": {"type": "boolean"}
+        }
+      }
+    },
+    "answers": {
+      "type": "object",
+      "required": [
+        "sourceReviewed",
+        "timeline",
+        "timelineConfirmed",
+        "evidenceStories",
+        "education",
+        "certifications",
+        "skills",
+        "projects",
+        "languages",
+        "finalReviewConfirmed"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "sourceReviewed": {"type": "boolean"},
+        "timeline": {"type": "array", "items": {"type": "object"}},
+        "timelineConfirmed": {"type": "boolean"},
+        "evidenceStories": {"type": "array", "items": {"type": "object"}},
+        "education": {"type": "array", "items": {"type": "object"}},
+        "certifications": {"type": "array", "items": {"type": "object"}},
+        "skills": {"type": "array", "items": {"type": "object"}},
+        "projects": {"type": "array", "items": {"type": "object"}},
+        "languages": {"type": "array", "items": {"type": "object"}},
+        "finalReviewConfirmed": {"type": "boolean"}
+      }
+    },
+    "notes": {"type": "array", "items": {"type": "string"}},
+    "askedQuestionIds": {"type": "array", "items": {"type": "string"}},
+    "nextQuestions": {
+      "type": "array",
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "question"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string"},
+          "question": {"type": "string"},
+          "why": {"type": "string"}
+        }
+      }
+    }
+  }
+}

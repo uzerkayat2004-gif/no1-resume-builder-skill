@@ -1,0 +1,223 @@
+{
+  "basics": {
+    "name": "Asha Raman",
+    "label": "Product Analyst",
+    "email": "asha.raman@example.com",
+    "phone": "+91 90000 00000",
+    "location": "Bengaluru, India",
+    "url": "https://example.com/asha-raman",
+    "profiles": [
+      {
+        "network": "LinkedIn",
+        "url": "https://www.linkedin.com/in/example-asha-raman"
+      }
+    ],
+    "summary": "Product analyst with four years of experience translating customer and operational data into product decisions for mobility and learning platforms.",
+    "summaryClaimIds": ["ev-years", "ev-domain"]
+  },
+  "skills": [
+    {
+      "name": "Analysis",
+      "keywords": ["SQL", "Python", "Experiment design", "Dashboarding"],
+      "claimIds": ["ev-tools"]
+    },
+    {
+      "name": "Product",
+      "keywords": ["Funnel analysis", "Customer research", "Requirements discovery"],
+      "claimIds": ["ev-product"]
+    }
+  ],
+  "work": [
+    {
+      "name": "Meridian Mobility",
+      "position": "Product Analyst",
+      "location": "Bengaluru, India",
+      "startDate": "2023-07",
+      "endDate": "present",
+      "claimIds": ["ev-current-role"],
+      "highlights": [
+        {
+          "text": "Built a weekly activation funnel in SQL and Python that helped the product team identify two onboarding drop-off points.",
+          "claimIds": ["ev-funnel"]
+        },
+        {
+          "text": "Designed an experiment for a revised driver checklist; the confirmed release increased first-week completion from 62% to 71%.",
+          "claimIds": ["ev-experiment"]
+        },
+        {
+          "text": "Combined support themes with usage data to prioritize three reliability fixes for the quarterly roadmap.",
+          "claimIds": ["ev-roadmap"]
+        }
+      ]
+    },
+    {
+      "name": "Northstar Learning",
+      "position": "Data Analyst",
+      "location": "Remote",
+      "startDate": "2021-06",
+      "endDate": "2023-06",
+      "claimIds": ["ev-prior-role"],
+      "highlights": [
+        {
+          "text": "Automated the monthly learner-retention report, reducing preparation time from two days to three hours.",
+          "claimIds": ["ev-automation"]
+        },
+        {
+          "text": "Partnered with product and curriculum teams to define adoption metrics for four new course features.",
+          "claimIds": ["ev-adoption"]
+        }
+      ]
+    }
+  ],
+  "projects": [
+    {
+      "name": "Public Transit Reliability Explorer",
+      "description": "Personal data-visualization project using an openly licensed transit feed.",
+      "url": "https://example.com/transit-project",
+      "startDate": "2024-02",
+      "endDate": "2024-05",
+      "claimIds": ["ev-project"],
+      "highlights": [
+        {
+          "text": "Created a reproducible Python pipeline and dashboard for comparing route reliability across time periods.",
+          "claimIds": ["ev-project"]
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Example Institute of Technology",
+      "area": "Information Science",
+      "studyType": "Bachelor of Engineering",
+      "location": "Mysuru, India",
+      "endDate": "2021",
+      "claimIds": ["ev-education"]
+    }
+  ],
+  "certificates": [
+    {
+      "name": "Product Analytics Foundations",
+      "issuer": "Example Learning Lab",
+      "date": "2024",
+      "claimIds": ["ev-certificate"]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev-years",
+      "claim": "Four years of relevant analytics experience",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-domain",
+      "claim": "Experience in mobility and learning products",
+      "sourceType": "uploaded-resume",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-tools",
+      "claim": "Uses SQL, Python, experiment design, and dashboards at work",
+      "sourceType": "portfolio",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-product",
+      "claim": "Experience with funnel analysis, customer research, and requirements discovery",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-current-role",
+      "claim": "Product Analyst at Meridian Mobility since July 2023",
+      "sourceType": "uploaded-resume",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-funnel",
+      "claim": "Built the weekly activation funnel and identified two drop-off points",
+      "sourceType": "portfolio",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-experiment",
+      "claim": "Checklist experiment increased first-week completion from 62% to 71%",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-roadmap",
+      "claim": "Analysis supported prioritization of three reliability fixes",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-prior-role",
+      "claim": "Data Analyst at Northstar Learning from June 2021 to June 2023",
+      "sourceType": "uploaded-resume",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-automation",
+      "claim": "Reporting automation reduced preparation from two days to three hours",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-adoption",
+      "claim": "Defined adoption metrics for four course features",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
+    {
+      "id": "ev-project",
+      "claim": "Built the Public Transit Reliability Explorer",
+      "sourceType": "portfolio",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-education",
+      "claim": "Bachelor of Engineering in Information Science, completed 2021",
+      "sourceType": "transcript",
+      "sourceStatus": "verified"
+    },
+    {
+      "id": "ev-certificate",
+      "claim": "Completed Product Analytics Foundations certificate in 2024",
+      "sourceType": "certificate",
+      "sourceStatus": "verified"
+    }
+  ],
+  "target": {
+    "role": "Product Analyst",
+    "level": "Mid-level",
+    "company": "Example Marketplace",
+    "requirements": [
+      {
+        "text": "SQL and product funnel analysis",
+        "status": "supported",
+        "claimIds": ["ev-tools", "ev-funnel"]
+      },
+      {
+        "text": "Experiment design and interpretation",
+        "status": "supported",
+        "claimIds": ["ev-experiment"]
+      },
+      {
+        "text": "Marketplace pricing analytics",
+        "status": "unsupported",
+        "claimIds": []
+      }
+    ]
+  },
+  "meta": {
+    "language": "en",
+    "region": "india",
+    "paperSize": "a4",
+    "allowUnverified": false,
+    "version": "1.0.0",
+    "lastModified": "2026-08-01"
+  }
+}
+
