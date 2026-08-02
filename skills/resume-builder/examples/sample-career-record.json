@@ -3,15 +3,10 @@
     "name": "Asha Raman",
     "label": "Product Analyst",
     "email": "asha.raman@example.com",
-    "phone": "+91 90000 00000",
     "location": "Bengaluru, India",
-    "url": "https://example.com/asha-raman",
-    "profiles": [
-      {
-        "network": "LinkedIn",
-        "url": "https://www.linkedin.com/in/example-asha-raman"
-      }
-    ],
+    "url": "https://example.com",
+    "profiles": [],
+    "claimIds": ["ev-identity"],
     "summary": "Product analyst with four years of experience translating customer and operational data into product decisions for mobility and learning platforms.",
     "summaryClaimIds": ["ev-years", "ev-domain"]
   },
@@ -73,7 +68,7 @@
     {
       "name": "Public Transit Reliability Explorer",
       "description": "Personal data-visualization project using an openly licensed transit feed.",
-      "url": "https://example.com/transit-project",
+      "url": "https://example.com",
       "startDate": "2024-02",
       "endDate": "2024-05",
       "claimIds": ["ev-project"],
@@ -104,6 +99,12 @@
     }
   ],
   "evidence": [
+    {
+      "id": "ev-identity",
+      "claim": "Asha Raman is a Product Analyst based in Bengaluru, India",
+      "sourceType": "user-statement",
+      "sourceStatus": "user-confirmed"
+    },
     {
       "id": "ev-years",
       "claim": "Four years of relevant analytics experience",
@@ -172,7 +173,7 @@
     },
     {
       "id": "ev-project",
-      "claim": "Built the Public Transit Reliability Explorer",
+      "claim": "Built the Public Transit Reliability Explorer from February to May 2024",
       "sourceType": "portfolio",
       "sourceStatus": "verified"
     },
@@ -216,7 +217,24 @@
     "region": "india",
     "paperSize": "a4",
     "allowUnverified": false,
-    "version": "1.0.0",
+    "approvedClaimDigests": {
+      "basics.identity": "401d9313c5b4a298186d72bd3d03d2e77809db452747b27a6d0f1d1ccd7f6faa",
+      "basics.summary": "78e927e237bf87395b65439db1d30e9db2663848d6692a4ee05427ce2f2b8a4e",
+      "skills[0]": "a3182e056440b49ec46ce0b63d153743273c9ba7ab92cc6d8603780c9d69a94f",
+      "skills[1]": "5a62deda91c65982a1f1027a422f36b5fe1f08d8c1ade0e0d0cef1d74e73274b",
+      "work[0]": "ae0a7497eda59095b25d9d53705b3ac24a002b590953eed14bab2a22652aebce",
+      "work[0].highlights[0]": "46c9a6a792e72cb2fdb6cd466b77fa57e71c147c82eea3f41fda904ad500d4d1",
+      "work[0].highlights[1]": "0ce611d452b765c1bc3c6486907e677a164b6a20b38f238b38c86ff5a31fe255",
+      "work[0].highlights[2]": "491c7fa9534c1d72c1719ec358ff4fbb9972b7e2a992cebeffea605061061a2a",
+      "work[1]": "daad032db234c5013966310a5f640c2c0048d07b00ca59e75a55818b790af041",
+      "work[1].highlights[0]": "b55033b4ecf4edbf1bb707098d54ec998d9676ad5369c29eaf76ace6f76d8c7f",
+      "work[1].highlights[1]": "78ca70480412a4d21291469fad09ea58d497045964c3b65765774454e4de306d",
+      "projects[0]": "1f06bee526c33fe62afb7ca12b3608cf1d811a6d95808830d52a134e3fee08d0",
+      "projects[0].highlights[0]": "27752f67affe92f525777d625f78afc1afa90b3f4a204bb9d0fcf4837b9b15c7",
+      "education[0]": "24e35ed132280e78bfdaf78708223abc5bf48af08334e5d667452778a65f59e9",
+      "certificates[0]": "64aea0a7e3d212935811b94511d2491e576d9ce26464a8a02440cb3bfa6e9f53"
+    },
+    "version": "1.2.0",
     "lastModified": "2026-08-01"
   }
 }

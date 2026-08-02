@@ -4,8 +4,8 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB.svg)
-![Local first](https://img.shields.io/badge/data-local--first-2ea44f.svg)
-![Tests](https://img.shields.io/badge/tests-10%20passing-brightgreen.svg)
+![Network-free helper](https://img.shields.io/badge/helper-no%20network%20calls-2ea44f.svg)
+![CI](https://github.com/uzerkayat2004-gif/no1-resume-builder-skill/actions/workflows/ci.yml/badge.svg)
 
 **Repository name:** `no1-resume-builder-skill`  
 **Installable skill ID:** `resume-builder`
@@ -17,6 +17,8 @@
 Most resume tools begin with a template. This project begins with evidence.
 
 It helps a person recover the facts of their career, understand what a target job requires, select the most relevant evidence, write clearly without fabrication, produce usable files, inspect what those files actually contain, and practice interviews from the same approved material.
+
+Privacy note: the bundled Python helper makes no network calls and omits full extracted resume text from session files by default. Codex or another AI host may still process attachments according to that platform's data controls. Do not upload unnecessary sensitive data, and review your account/workspace settings.
 
 It is intended for students, first-job applicants, experienced professionals, career changers, returners, freelancers, skilled tradespeople, healthcare workers, researchers, public servants, executives, and people in uncommon occupations.
 
@@ -66,8 +68,9 @@ flowchart LR
     G --> H
     H --> I["Create base or job-tailored resume"]
     I --> J["Validate claims and numeric evidence"]
-    J --> K["Render and inspect DOCX/PDF/TXT"]
-    K --> L["Create evidence-linked interview practice"]
+    J --> K["Candidate approves exact facts and wording"]
+    K --> M["Render and inspect DOCX/PDF/TXT"]
+    M --> L["Create evidence-linked interview practice"]
 ```
 
 ### Path A: Use an old or current resume
@@ -131,7 +134,7 @@ This repository does not rely on generic “ATS secrets.” It compares official
 | [O*NET](https://www.onetcenter.org/database.html) and [ESCO](https://esco.ec.europa.eu/en/use-esco/use-esco-services-api/esco-web-service-api) | Structured occupation and skill terminology | Domain-aware questions without assigning unverified skills to a candidate |
 | [MIT Sloan field experiment](https://mitsloan.mit.edu/ideas-made-to-matter/job-seekers-ai-boosted-resumes-more-likely-to-be-hired) | Writing assistance improved outcomes in a large experiment | Improve clarity, spelling and grammar without inventing qualifications |
 | [JSON Resume](https://github.com/jsonresume/resume-schema) | Open structured resume schema | A canonical JSON career record with validation |
-| [Reactive Resume](https://github.com/AmruthPillai/Reactive-Resume) | Privacy, ownership and portable exports | Local-first processing and reusable structured data |
+| [Reactive Resume](https://github.com/AmruthPillai/Reactive-Resume) | Privacy, ownership and portable exports | Network-free helper, minimal saved intake data, AI-host disclosure, and reusable structured data |
 | [OpenResume](https://github.com/xitanggg/open-resume) | Builder plus parser | Import an existing resume and show what extracted |
 | [RenderCV](https://github.com/rendercv/rendercv) | Content-as-data and reproducible rendering | Deterministic output and source-controlled career records |
 
@@ -146,7 +149,7 @@ It does **not** mean a magical template or guaranteed ATS ranking. It means the 
 - readable: clear hierarchy, restrained typography and natural language;
 - extractable: actual document text is inspected after rendering;
 - adaptable: domain, career stage, country and document type can change;
-- private: local tools make no uploads or network calls;
+- private by design: the helper makes no uploads/network calls, saves minimal intake data by default, and discloses AI-host processing;
 - auditable: sources, gaps, assumptions and unsupported requirements remain visible;
 - useful after the resume: interview practice reuses the approved evidence.
 
@@ -187,14 +190,14 @@ See [Tested examples](docs/tested-examples.md) and [evaluation prompts](evals/ev
 
 ## Validation performed
 
-- 10 deterministic automated tests pass.
+- 19 deterministic automated tests pass.
 - Unsupported or unverified final claims are blocked.
 - Numeric detail must appear in cited evidence.
 - Old-resume import does not overwrite the source.
 - Intake batches contain no more than three questions.
 - DOCX and PDF are generated without layout tables.
 - The synthetic DOCX and PDF passed visual inspection.
-- Both demonstration files preserved all 205 expected material tokens during extraction.
+- Both demonstration files preserved all 200 expected material tokens during extraction.
 - The source skill and unpacked `.skill` archive pass the official Codex skill validator.
 
 This is an observable extraction check, not an ATS ranking or prediction of employer behavior.
@@ -214,7 +217,7 @@ python skills/resume-builder/scripts/resume_tool.py start \
   --journey scratch \
   --role "Registered Nurse" \
   --region "UAE" \
-  --out session.json
+  --out private/session.intake.json
 ```
 
 Import an existing resume:
@@ -225,13 +228,13 @@ python skills/resume-builder/scripts/resume_tool.py start \
   --source old-resume.pdf \
   --role "Product Manager" \
   --region "India" \
-  --out session.json
+  --out private/session.intake.json
 ```
 
 Inspect progress or route a domain:
 
 ```bash
-python skills/resume-builder/scripts/resume_tool.py status session.json
+python skills/resume-builder/scripts/resume_tool.py status private/session.intake.json
 python skills/resume-builder/scripts/resume_tool.py domain "supply chain and procurement manager"
 ```
 
@@ -240,6 +243,11 @@ Validate, render and verify:
 ```bash
 python skills/resume-builder/scripts/resume_tool.py validate \
   skills/resume-builder/examples/sample-career-record.json
+
+# For a candidate's own draft, run this only after they confirm every material fact:
+python skills/resume-builder/scripts/resume_tool.py approve \
+  private/draft.career-record.json \
+  --out private/approved.career-record.json
 
 python skills/resume-builder/scripts/resume_tool.py render \
   skills/resume-builder/examples/sample-career-record.json \
@@ -250,7 +258,7 @@ python skills/resume-builder/scripts/resume_tool.py verify \
   build/sample/Asha_Raman_Product_Analyst_Resume.pdf
 ```
 
-Intake sessions can contain personal data and extracted resume text. Do not commit them to a public repository.
+Intake sessions contain personal career data. Full extracted text is omitted by default; do not commit sessions to a public repository.
 
 ## Repository structure
 

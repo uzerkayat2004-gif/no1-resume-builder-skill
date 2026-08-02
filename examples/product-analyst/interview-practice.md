@@ -7,7 +7,12 @@ Use these prompts to practice truthful, conversational answers. The claim IDs ar
 1. Walk me through your background and why it is relevant to Product Analyst.
    - Build a 60-90 second answer from the summary and the two most relevant recent roles.
 
-## Requirement questions
+## Screening questions
+
+1. Why are you interested in Product Analyst, and what evidence makes you a credible match?
+2. What are your availability, location, and work-authorization constraints? Answer only what is lawful and relevant in your market.
+
+## Requirement and technical/domain questions
 
 1. The role requires: SQL and product funnel analysis
    - Evidence status: supported
@@ -19,6 +24,13 @@ Use these prompts to practice truthful, conversational answers. The claim IDs ar
    - Evidence status: unsupported
    - Evidence anchors: none
    - Practice an honest gap response: acknowledge the gap, name adjacent evidence, and explain how you would close it.
+
+## Behavioral questions
+
+1. Tell me about a difficult problem you solved with incomplete information.
+2. Describe a disagreement with a stakeholder and how you handled it.
+3. Tell me about a mistake or failed approach and what changed afterward.
+   - Use STAR-R: Situation, Task, Action, Result, Reflection.
 
 ## Resume deep dives
 
@@ -34,6 +46,19 @@ Use these prompts to practice truthful, conversational answers. The claim IDs ar
 4. Walk me through this result: “Partnered with product and curriculum teams to define adoption metrics for four new course features.”
    - Evidence anchors: ev-adoption
    - Cover Situation, Task, Action, Result, and Reflection. Be ready to explain your exact contribution, trade-offs, and what you learned.
+
+## Honest gap responses
+
+- State the gap directly; do not imply experience you do not have.
+- Connect the closest verified, transferable evidence.
+- Explain a concrete learning or first-90-days plan without promising certainty.
+
+## Questions for the interviewer
+
+- What outcomes would define success in the first 90 days?
+- Which problems are most urgent for this role?
+- How are decisions made and work reviewed on this team?
+- What distinguishes strong performers here after one year?
 
 ## Reusable follow-ups
 

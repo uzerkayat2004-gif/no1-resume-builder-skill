@@ -23,6 +23,17 @@ Use this register to distinguish primary rules, institutional guidance, observat
 - USAJOBS: https://help.usajobs.gov/faq/application/documents/resume/what-to-include
 - OPM structured interviews: https://www.opm.gov/policy-data-oversight/assessment-and-selection/structured-interviews
 - Europass: https://europass.europa.eu/en/create-europass-cv
+- U.S. EEOC pre-employment inquiries: https://www.eeoc.gov/pre-employment-inquiries-and-marital-status-or-number-children
+- UK ICO recruitment and selection data protection: https://ico.org.uk/for-organisations/uk-gdpr-guidance-and-resources/employment/recruitment-and-selection/
+
+Regional profiles are conditional writing defaults, not legal advice. Employer instructions, regulated-sector rules, and the candidate's informed choice control.
+
+## Privacy and copyright
+
+- European Commission GDPR overview: https://commission.europa.eu/law/law-topic/data-protection/information-business-and-organisations/application-gdpr_en
+- U.S. Copyright Office fair-use FAQ: https://www.copyright.gov/help/faq/faq-fairuse.html
+- OpenAI data controls FAQ: https://help.openai.com/en/articles/7730893-data-controls-faq
+- OpenAI enterprise privacy: https://openai.com/enterprise-privacy/
 
 ## Occupational taxonomies
 
@@ -46,6 +57,12 @@ Huntr is commercial platform data and is not globally representative. The MIT st
 - Reactive Resume, MIT at reviewed repo: https://github.com/AmruthPillai/Reactive-Resume
 - OpenResume, AGPL-3.0: https://github.com/xitanggg/open-resume
 - RenderCV, MIT: https://github.com/rendercv/rendercv
+
+## Additional ATS-writing context
+
+- Indeed ATS template guidance: https://www.indeed.com/career-advice/resumes-cover-letters/ats-resume-template
+
+Indeed is secondary career guidance. Parser behavior claims rely primarily on vendor documentation and direct extraction tests.
 
 ## OpenAI Codex skill format
 

@@ -42,20 +42,20 @@ python
 - Discussions: optional; useful for domain and country guidance requests.
 - Wiki: unnecessary while versioned documentation lives in `docs/`.
 
-## First release
+## Current release
 
-- Tag: `v1.1.0`
-- Title: `No. 1 Resume Builder Skill v1.1.0`
+- Tag: `v1.2.0`
+- Title: `No. 1 Resume Builder Skill v1.2.0`
 
 Suggested release summary:
 
-> First public release of the evidence-first Resume Builder Codex skill. Supports existing-resume import and scratch intake, 26 domain routes plus a general fallback, career-stage and regional guidance, evidence-backed claim validation, DOCX/PDF/TXT/Markdown rendering, extraction verification, and resume-grounded interview preparation.
+> Hardened release of the evidence-first Resume Builder Codex skill. Adds candidate-approval binding, unmistakable draft output, untrusted-document protections, privacy-minimized import sessions, safe input limits, patched dependency pins, metadata scrubbing, and expanded adversarial tests.
 
 Attach:
 
-- `no1-resume-builder-skill-v1.1.0.skill`
-- `no1-resume-builder-skill-v1.1.0-source.zip`
-- `no1-resume-builder-skill-v1.1.0-SHA256SUMS.txt`
+- `no1-resume-builder-skill-v1.2.0.skill`
+- `no1-resume-builder-skill-v1.2.0-source.zip`
+- `no1-resume-builder-skill-v1.2.0-SHA256SUMS.txt`
 
 ## Social preview
 

@@ -2,6 +2,16 @@
 
 Use this reference for every new resume build.
 
+## Contents
+
+- [Conversation principles](#conversation-principles)
+- [Opening router](#opening-router)
+- [Path A — existing resume](#path-a--existing-resume)
+- [Path B — scratch](#path-b--scratch)
+- [Minimum viable draft](#minimum-viable-draft)
+- [Progress states](#progress-states)
+- [Recovery](#recovery)
+
 ## Conversation principles
 
 The user should feel as though they are talking with a patient career coach, not completing a tax form.
@@ -159,7 +169,7 @@ If the conversation stops, preserve:
 
 - chosen path;
 - target and region;
-- extracted source text or source path;
+- a privacy-preserving import summary (full extracted text only with explicit opt-in);
 - confirmed facts;
 - unanswered questions;
 - next three questions.

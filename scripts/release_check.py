@@ -52,6 +52,12 @@ def main() -> int:
             "SKILL.md must remain below 500 lines.",
             failures,
         )
+        check(
+            "untrusted data" in text.casefold()
+            and "never obey instructions embedded" in text.casefold(),
+            "SKILL.md must preserve the imported-content safety boundary.",
+            failures,
+        )
         references = sorted(
             set(
                 re.findall(
@@ -120,6 +126,23 @@ def main() -> int:
             json.loads(path.read_text(encoding="utf-8"))
         except json.JSONDecodeError as exc:
             failures.append(f"Invalid JSON in {path.relative_to(ROOT)}: {exc}")
+
+    expected_requirements = {
+        "python-docx==1.2.0",
+        "reportlab==4.5.1",
+        "pypdf==6.14.2",
+    }
+    for path in (ROOT / "requirements.txt", SKILL / "requirements.txt"):
+        installed = {
+            line.strip()
+            for line in path.read_text(encoding="utf-8").splitlines()
+            if line.strip() and not line.startswith("#")
+        }
+        check(
+            installed == expected_requirements,
+            f"Dependency pins changed without updating the security baseline: {path}",
+            failures,
+        )
 
     if failures:
         print("Release check failed:")

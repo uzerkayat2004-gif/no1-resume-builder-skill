@@ -9,15 +9,19 @@ or marked unverified unless a record explicitly opts into an unverified draft.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import json
 import re
 import sys
+import tempfile
 import uuid
+import zipfile
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 
 
@@ -31,6 +35,13 @@ NUMBER_RE = re.compile(
 )
 WORD_RE = re.compile(r"[\w+#./-]+", re.UNICODE)
 MATERIAL_STATUSES = {"verified", "user-confirmed"}
+MAX_INPUT_BYTES = 20 * 1024 * 1024
+MAX_PDF_PAGES = 50
+MAX_EXTRACTED_CHARACTERS = 500_000
+MAX_DOCX_ENTRIES = 2_000
+MAX_DOCX_UNCOMPRESSED_BYTES = 100 * 1024 * 1024
+MAX_DOCX_COMPRESSION_RATIO = 100
+DRAFT_LABEL = "DRAFT — UNVERIFIED CLAIMS — NOT READY TO SUBMIT"
 
 
 def load_record(path: Path) -> dict[str, Any]:
@@ -54,6 +65,17 @@ def _all_strings(value: Any) -> Iterable[str]:
 
 def _claim_refs(record: dict[str, Any]) -> Iterable[tuple[str, list[str], str]]:
     basics = record.get("basics", {})
+    identity = " | ".join(
+        str(part)
+        for part in (
+            basics.get("name", ""),
+            basics.get("label", ""),
+            basics.get("location", ""),
+        )
+        if part
+    )
+    if identity:
+        yield "basics.identity", basics.get("claimIds", []), identity
     if basics.get("summary"):
         yield (
             "basics.summary",
@@ -72,7 +94,10 @@ def _claim_refs(record: dict[str, Any]) -> Iterable[tuple[str, list[str], str]]:
                 for part in (
                     item.get("position", ""),
                     item.get("name", ""),
+                    item.get("location", ""),
+                    _date_range(item),
                     item.get("description", ""),
+                    item.get("summary", ""),
                 )
                 if part
             )
@@ -96,6 +121,8 @@ def _claim_refs(record: dict[str, Any]) -> Iterable[tuple[str, list[str], str]]:
                 item.get("studyType", ""),
                 item.get("area", ""),
                 item.get("institution", ""),
+                item.get("location", ""),
+                _date_range(item),
                 item.get("score", ""),
             )
             if part
@@ -133,9 +160,157 @@ def _numbers(text: str) -> set[str]:
     }
 
 
-def validate_record(record: dict[str, Any]) -> dict[str, Any]:
+def _claim_digest(text: str) -> str:
+    normalized = re.sub(r"\s+", " ", text).strip().casefold()
+    return hashlib.sha256(normalized.encode("utf-8")).hexdigest()
+
+
+def approval_digests(record: dict[str, Any]) -> dict[str, str]:
+    """Bind every rendered material claim to the candidate-approved wording."""
+    return {
+        location: _claim_digest(text)
+        for location, _, text in _claim_refs(record)
+        if not location.startswith("target.") and text.strip()
+    }
+
+
+def _structure_errors(record: Any) -> list[str]:
     errors: list[str] = []
+    if not isinstance(record, dict):
+        return ["The career record must be a JSON object."]
+
+    def require_object(value: Any, location: str) -> dict[str, Any]:
+        if not isinstance(value, dict):
+            errors.append(f"{location} must be an object.")
+            return {}
+        return value
+
+    def require_array(value: Any, location: str) -> list[Any]:
+        if not isinstance(value, list):
+            errors.append(f"{location} must be an array.")
+            return []
+        return value
+
+    def require_string(value: Any, location: str) -> None:
+        if value is not None and not isinstance(value, str):
+            errors.append(f"{location} must be a string.")
+
+    def require_string_array(value: Any, location: str) -> list[Any]:
+        items = require_array(value, location)
+        for index, item in enumerate(items):
+            if not isinstance(item, str):
+                errors.append(f"{location}[{index}] must be a string.")
+        return items
+
+    def check_fields(item: dict[str, Any], location: str, fields: Iterable[str]) -> None:
+        for field in fields:
+            if field in item:
+                require_string(item[field], f"{location}.{field}")
+
+    basics = require_object(record.get("basics"), "basics")
+    check_fields(
+        basics,
+        "basics",
+        ("name", "label", "email", "phone", "location", "url", "summary"),
+    )
+    for index, profile in enumerate(require_array(basics.get("profiles", []), "basics.profiles")):
+        profile_item = require_object(profile, f"basics.profiles[{index}]")
+        check_fields(profile_item, f"basics.profiles[{index}]", ("network", "url"))
+    require_string_array(basics.get("claimIds", []), "basics.claimIds")
+    require_string_array(basics.get("summaryClaimIds", []), "basics.summaryClaimIds")
+
+    for section in (
+        "skills",
+        "work",
+        "projects",
+        "education",
+        "certificates",
+        "awards",
+        "languages",
+        "evidence",
+    ):
+        for index, raw_item in enumerate(require_array(record.get(section, []), section)):
+            item = require_object(raw_item, f"{section}[{index}]")
+            require_string_array(item.get("claimIds", []), f"{section}[{index}].claimIds")
+            field_map = {
+                "skills": ("name",),
+                "work": ("name", "position", "location", "startDate", "endDate", "summary"),
+                "projects": ("name", "description", "url", "startDate", "endDate"),
+                "education": (
+                    "institution",
+                    "area",
+                    "studyType",
+                    "location",
+                    "startDate",
+                    "endDate",
+                    "score",
+                ),
+                "certificates": ("name", "issuer", "date", "url"),
+                "awards": ("title", "awarder", "date", "summary"),
+                "languages": ("language", "fluency"),
+                "evidence": ("id", "claim", "sourceType", "sourceStatus", "sourceNote"),
+            }
+            check_fields(item, f"{section}[{index}]", field_map[section])
+            if "sensitive" in item and not isinstance(item["sensitive"], bool):
+                errors.append(f"{section}[{index}].sensitive must be a boolean.")
+            if section == "skills":
+                require_string_array(item.get("keywords", []), f"skills[{index}].keywords")
+            if section in {"work", "projects", "education"}:
+                for h_index, raw_highlight in enumerate(
+                    require_array(item.get("highlights", []), f"{section}[{index}].highlights")
+                ):
+                    highlight = require_object(
+                        raw_highlight, f"{section}[{index}].highlights[{h_index}]"
+                    )
+                    check_fields(
+                        highlight,
+                        f"{section}[{index}].highlights[{h_index}]",
+                        ("text",),
+                    )
+                    require_string_array(
+                        highlight.get("claimIds", []),
+                        f"{section}[{index}].highlights[{h_index}].claimIds",
+                    )
+
+    target = require_object(record.get("target", {}), "target")
+    check_fields(
+        target, "target", ("role", "level", "company", "jobDescription")
+    )
+    for index, raw_requirement in enumerate(
+        require_array(target.get("requirements", []), "target.requirements")
+    ):
+        requirement = require_object(raw_requirement, f"target.requirements[{index}]")
+        check_fields(
+            requirement, f"target.requirements[{index}]", ("text", "status")
+        )
+        require_string_array(
+            requirement.get("claimIds", []), f"target.requirements[{index}].claimIds"
+        )
+    meta = require_object(record.get("meta", {}), "meta")
+    check_fields(meta, "meta", ("language", "region", "paperSize", "version", "lastModified"))
+    if "allowUnverified" in meta and not isinstance(meta["allowUnverified"], bool):
+        errors.append("meta.allowUnverified must be a boolean.")
+    digests = meta.get("approvedClaimDigests", {})
+    if not isinstance(digests, dict) or not all(
+        isinstance(key, str) and isinstance(value, str)
+        for key, value in getattr(digests, "items", lambda: [])()
+    ):
+        errors.append("meta.approvedClaimDigests must be an object of string digests.")
+    return errors
+
+
+def validate_record(
+    record: dict[str, Any], *, require_approval: bool = True
+) -> dict[str, Any]:
+    errors = _structure_errors(record)
     warnings: list[str] = []
+    if errors:
+        return {
+            "valid": False,
+            "errors": errors,
+            "warnings": warnings,
+            "evidence": {"total": 0, "used": 0, "verified_or_confirmed": 0, "unverified": 0},
+        }
     basics = record.get("basics")
     if not isinstance(basics, dict):
         errors.append("Missing basics object.")
@@ -174,7 +349,9 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
         if not str(item.get("claim", "")).strip():
             errors.append(f"Evidence {evidence_id} has no claim text.")
 
-    allow_unverified = bool(record.get("meta", {}).get("allowUnverified", False))
+    meta = record.get("meta", {})
+    allow_unverified = bool(meta.get("allowUnverified", False))
+    approved_digests = meta.get("approvedClaimDigests", {})
     used_evidence: set[str] = set()
     for location, claim_ids, text in _claim_refs(record):
         if not text.strip():
@@ -201,6 +378,21 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
                 f"{location} contains numeric detail not found in its cited evidence: "
                 + ", ".join(sorted(unsupported_numbers))
             )
+        if (
+            require_approval
+            and not allow_unverified
+            and not location.startswith("target.")
+            and approved_digests.get(location) != _claim_digest(text)
+        ):
+            errors.append(
+                f"{location} changed or was not explicitly approved by the candidate; "
+                "run the approval step after fact review."
+            )
+
+    if allow_unverified:
+        warnings.append(
+            "This is an unverified draft. Every output will be visibly marked and must not be submitted."
+        )
 
     for section in ("work", "projects"):
         for index, item in enumerate(record.get(section, [])):
@@ -268,6 +460,20 @@ def validate_record(record: dict[str, Any]) -> dict[str, Any]:
             ),
         },
     }
+
+
+def approve_record(record: dict[str, Any]) -> dict[str, Any]:
+    """Create no-drift approval digests after the candidate confirms every fact."""
+    candidate = copy.deepcopy(record)
+    candidate.setdefault("meta", {})["allowUnverified"] = False
+    report = validate_record(candidate, require_approval=False)
+    if not report["valid"]:
+        raise ValueError(
+            "Career record failed pre-approval validation:\n- "
+            + "\n- ".join(report["errors"])
+        )
+    candidate["meta"]["approvedClaimDigests"] = approval_digests(candidate)
+    return candidate
 
 
 def _month_label(value: str) -> str:
@@ -449,7 +655,10 @@ def document_sections(record: dict[str, Any]) -> list[tuple[str, list[dict[str, 
 
 def build_plain_text(record: dict[str, Any]) -> str:
     basics = record.get("basics", {})
-    lines = [basics.get("name", "")]
+    lines = []
+    if record.get("meta", {}).get("allowUnverified", False):
+        lines.extend([DRAFT_LABEL, ""])
+    lines.append(basics.get("name", ""))
     if basics.get("label"):
         lines.append(basics["label"])
     contact = _contact_line(basics)
@@ -472,7 +681,10 @@ def build_plain_text(record: dict[str, Any]) -> str:
 
 def build_markdown(record: dict[str, Any]) -> str:
     basics = record.get("basics", {})
-    lines = [f"# {basics.get('name', '')}"]
+    lines = []
+    if record.get("meta", {}).get("allowUnverified", False):
+        lines.extend([f"> **{DRAFT_LABEL}**", ""])
+    lines.append(f"# {basics.get('name', '')}")
     if basics.get("label"):
         lines.append(f"**{basics['label']}**")
     contact = _contact_line(basics)
@@ -665,6 +877,7 @@ def render_docx(record: dict[str, Any], output: Path) -> None:
     normal.paragraph_format.line_spacing = 1.0
 
     _add_style(document, "Resume Name", 20, bold=True, center=True, after=1)
+    _add_style(document, "Resume Draft", 10, bold=True, center=True, after=5, color="B00020")
     _add_style(document, "Resume Label", 11, bold=True, center=True, after=1)
     _add_style(document, "Resume Contact", 9, center=True, after=7)
     _add_style(
@@ -707,6 +920,8 @@ def render_docx(record: dict[str, Any], output: Path) -> None:
     bullet_num_id = _create_bullet_numbering(document)
 
     basics = record.get("basics", {})
+    if record.get("meta", {}).get("allowUnverified", False):
+        document.add_paragraph(DRAFT_LABEL, style="Resume Draft")
     document.add_paragraph(basics.get("name", ""), style="Resume Name")
     if basics.get("label"):
         document.add_paragraph(basics["label"], style="Resume Label")
@@ -738,6 +953,72 @@ def render_docx(record: dict[str, Any], output: Path) -> None:
     properties.comments = ""
     output.parent.mkdir(parents=True, exist_ok=True)
     document.save(output)
+    scrub_docx_metadata(output)
+
+
+def scrub_docx_metadata(output: Path) -> None:
+    """Remove author/time/revision metadata without changing visible content."""
+    word_namespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+    core_namespace = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
+    dc_namespace = "http://purl.org/dc/elements/1.1/"
+    dcterms_namespace = "http://purl.org/dc/terms/"
+    removable_core = {
+        f"{{{dc_namespace}}}creator",
+        f"{{{core_namespace}}}lastModifiedBy",
+        f"{{{core_namespace}}}revision",
+        f"{{{dcterms_namespace}}}created",
+        f"{{{dcterms_namespace}}}modified",
+    }
+    temporary = output.with_suffix(output.suffix + ".tmp")
+    try:
+        with zipfile.ZipFile(output, "r") as source, zipfile.ZipFile(
+            temporary, "w", compression=zipfile.ZIP_DEFLATED
+        ) as destination:
+            for info in source.infolist():
+                if info.filename.startswith("customXml/"):
+                    continue
+                data = source.read(info.filename)
+                if info.filename.endswith(".xml"):
+                    try:
+                        root = ElementTree.fromstring(data)
+                        if info.filename == "docProps/core.xml":
+                            for child in list(root):
+                                if child.tag in removable_core:
+                                    root.remove(child)
+                        if info.filename == "[Content_Types].xml":
+                            for child in list(root):
+                                if str(child.get("PartName", "")).startswith("/customXml/"):
+                                    root.remove(child)
+                        if info.filename.startswith("word/"):
+                            for element in root.iter():
+                                for attribute in list(element.attrib):
+                                    if attribute.startswith(f"{{{word_namespace}}}rsid"):
+                                        del element.attrib[attribute]
+                                for child in list(element):
+                                    local_name = child.tag.rsplit("}", 1)[-1]
+                                    if local_name == "rsids" or local_name.startswith("rsid"):
+                                        element.remove(child)
+                        data = ElementTree.tostring(
+                            root, encoding="utf-8", xml_declaration=True
+                        )
+                    except ElementTree.ParseError:
+                        pass
+                if info.filename.endswith(".rels"):
+                    try:
+                        root = ElementTree.fromstring(data)
+                        for child in list(root):
+                            if "customXml/" in str(child.get("Target", "")):
+                                root.remove(child)
+                        data = ElementTree.tostring(
+                            root, encoding="utf-8", xml_declaration=True
+                        )
+                    except ElementTree.ParseError:
+                        pass
+                destination.writestr(info, data)
+        temporary.replace(output)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
 
 
 def _pdf_fonts() -> dict[str, str]:
@@ -818,6 +1099,15 @@ def render_pdf(record: dict[str, Any], output: Path) -> None:
             alignment=TA_CENTER,
             spaceAfter=1,
         ),
+        "draft": ParagraphStyle(
+            "ResumeDraft",
+            fontName=fonts["bold"],
+            fontSize=9.5,
+            leading=11,
+            textColor="#B00020",
+            alignment=TA_CENTER,
+            spaceAfter=5,
+        ),
         "label": ParagraphStyle(
             "ResumeLabel",
             fontName=fonts["bold"],
@@ -878,6 +1168,8 @@ def render_pdf(record: dict[str, Any], output: Path) -> None:
         ),
     }
     story: list[Any] = []
+    if record.get("meta", {}).get("allowUnverified", False):
+        story.append(Paragraph(escape(DRAFT_LABEL), styles["draft"]))
     story.append(Paragraph(escape(str(basics.get("name", ""))), styles["name"]))
     if basics.get("label"):
         story.append(Paragraph(escape(str(basics["label"])), styles["label"]))
@@ -902,6 +1194,38 @@ def render_pdf(record: dict[str, Any], output: Path) -> None:
                     Paragraph(f"• {escape(str(bullet))}", styles["bullet"])
                 )
     doc.build(story)
+    scrub_pdf_metadata(output)
+
+
+def scrub_pdf_metadata(output: Path) -> None:
+    """Rewrite a generated PDF without timestamps, actions, or attachments."""
+    try:
+        from pypdf import PdfReader, PdfWriter
+    except ImportError as exc:
+        raise RuntimeError("PDF metadata scrubbing requires pypdf.") from exc
+    reader = PdfReader(str(output))
+    writer = PdfWriter()
+    for page in reader.pages:
+        writer.add_page(page)
+    title = str((reader.metadata or {}).get("/Title", "Resume"))
+    writer.add_metadata({"/Title": title, "/Author": "", "/Subject": ""})
+    temporary = output.with_suffix(output.suffix + ".tmp")
+    try:
+        with temporary.open("wb") as handle:
+            writer.write(handle)
+        temporary.replace(output)
+    finally:
+        if temporary.exists():
+            temporary.unlink()
+
+
+def _sanitize_basename(raw: str) -> str:
+    value = re.sub(r"[^\w.-]+", "_", str(raw), flags=re.UNICODE)
+    value = re.sub(r"_+", "_", value).strip("_.")[:120]
+    reserved = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)), *(f"LPT{i}" for i in range(1, 10))}
+    if value.upper() in reserved:
+        value = f"Resume_{value}"
+    return value or "Resume"
 
 
 def safe_basename(record: dict[str, Any]) -> str:
@@ -916,9 +1240,7 @@ def safe_basename(record: dict[str, Any]) -> str:
         )
         if part
     )
-    raw = re.sub(r"[^\w.-]+", "_", raw, flags=re.UNICODE)
-    raw = re.sub(r"_+", "_", raw).strip("_.")
-    return raw or "Resume"
+    return _sanitize_basename(raw)
 
 
 def render_all(
@@ -933,7 +1255,10 @@ def render_all(
             "Career record failed validation:\n- " + "\n- ".join(validation["errors"])
         )
     outdir.mkdir(parents=True, exist_ok=True)
-    stem = basename or safe_basename(record)
+    stem = _sanitize_basename(basename) if basename else safe_basename(record)
+    is_draft = bool(record.get("meta", {}).get("allowUnverified", False))
+    if is_draft and not stem.upper().endswith("_DRAFT"):
+        stem += "_DRAFT"
     files: dict[str, str] = {}
     for format_name in formats:
         format_name = format_name.lower().strip()
@@ -948,10 +1273,11 @@ def render_all(
             output.write_text(build_markdown(record), encoding="utf-8")
         else:
             raise ValueError(f"Unsupported output format: {format_name}")
-        files[format_name] = str(output.resolve())
+        files[format_name] = output.name
 
     manifest = {
         "recordValid": True,
+        "draft": is_draft,
         "basename": stem,
         "formats": files,
         "warnings": validation["warnings"],
@@ -962,13 +1288,70 @@ def render_all(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    manifest["manifest"] = str(manifest_path.resolve())
+    manifest["manifest"] = manifest_path.name
     return manifest
 
 
+def _check_input_file(document_path: Path) -> None:
+    if not document_path.exists() or not document_path.is_file():
+        raise ValueError(f"Document not found: {document_path}")
+    size = document_path.stat().st_size
+    if size > MAX_INPUT_BYTES:
+        raise ValueError(
+            f"Document is too large ({size} bytes); limit is {MAX_INPUT_BYTES} bytes."
+        )
+
+
+def _check_docx_archive(document_path: Path) -> None:
+    try:
+        with zipfile.ZipFile(document_path, "r") as archive:
+            entries = archive.infolist()
+            if len(entries) > MAX_DOCX_ENTRIES:
+                raise ValueError("DOCX contains too many archive entries.")
+            total_compressed = 0
+            total_uncompressed = 0
+            for entry in entries:
+                normalized = entry.filename.replace("\\", "/")
+                parts = Path(normalized).parts
+                if normalized.startswith("/") or ".." in parts:
+                    raise ValueError("DOCX contains an unsafe archive path.")
+                if entry.flag_bits & 0x1:
+                    raise ValueError("Encrypted DOCX archive entries are not supported.")
+                lower = normalized.casefold()
+                if lower.endswith("vbaproject.bin") or "/embeddings/" in f"/{lower}":
+                    raise ValueError("Macro-enabled or embedded-object DOCX files are not accepted.")
+                if lower.endswith((".xml", ".rels")):
+                    prefix = archive.read(entry)[:8192].upper()
+                    if b"<!DOCTYPE" in prefix or b"<!ENTITY" in prefix:
+                        raise ValueError("DOCX XML declarations with entities are not accepted.")
+                total_compressed += max(entry.compress_size, 1)
+                total_uncompressed += entry.file_size
+            if total_uncompressed > MAX_DOCX_UNCOMPRESSED_BYTES:
+                raise ValueError("DOCX expands beyond the safe uncompressed-size limit.")
+            if (
+                total_uncompressed > 1_000_000
+                and total_uncompressed / max(total_compressed, 1)
+                > MAX_DOCX_COMPRESSION_RATIO
+            ):
+                raise ValueError("DOCX has a suspicious archive compression ratio.")
+    except zipfile.BadZipFile as exc:
+        raise ValueError("DOCX is not a valid Office archive.") from exc
+
+
+def _bounded_text(text: str) -> str:
+    if len(text) > MAX_EXTRACTED_CHARACTERS:
+        raise ValueError(
+            "Extracted text exceeds the safe character limit "
+            f"({MAX_EXTRACTED_CHARACTERS})."
+        )
+    return text.strip() + "\n" if text.strip() else ""
+
+
 def extract_text(document_path: Path) -> str:
+    _check_input_file(document_path)
     suffix = document_path.suffix.lower()
     if suffix == ".docx":
+        _check_docx_archive(document_path)
         try:
             from docx import Document
         except ImportError as exc:
@@ -978,17 +1361,28 @@ def extract_text(document_path: Path) -> str:
         for table in document.tables:
             for row in table.rows:
                 chunks.append(" | ".join(cell.text for cell in row.cells))
-        return "\n".join(chunks).strip() + "\n"
+        return _bounded_text("\n".join(chunks))
     if suffix == ".pdf":
         try:
             from pypdf import PdfReader
         except ImportError as exc:
             raise RuntimeError("PDF extraction requires pypdf.") from exc
         reader = PdfReader(str(document_path))
-        chunks = [(page.extract_text() or "") for page in reader.pages]
-        return "\n".join(chunks).strip() + "\n"
+        if reader.is_encrypted:
+            raise ValueError("Encrypted PDFs are not supported.")
+        if len(reader.pages) > MAX_PDF_PAGES:
+            raise ValueError(f"PDF has more than {MAX_PDF_PAGES} pages.")
+        chunks: list[str] = []
+        total = 0
+        for page in reader.pages:
+            chunk = page.extract_text() or ""
+            total += len(chunk)
+            if total > MAX_EXTRACTED_CHARACTERS:
+                raise ValueError("PDF extracted text exceeds the safe character limit.")
+            chunks.append(chunk)
+        return _bounded_text("\n".join(chunks))
     if suffix in {".txt", ".md"}:
-        return document_path.read_text(encoding="utf-8")
+        return _bounded_text(document_path.read_text(encoding="utf-8"))
     raise ValueError(f"Unsupported document type: {suffix}")
 
 
@@ -1086,6 +1480,70 @@ def _file_digest(path: Path) -> str:
     return digest.hexdigest()
 
 
+def summarize_imported_text(text: str) -> dict[str, Any]:
+    """Return a privacy-preserving understanding report without copying source text."""
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    heading_names = {
+        "summary": ("summary", "profile", "objective"),
+        "experience": ("experience", "employment", "work history"),
+        "education": ("education", "academic background"),
+        "skills": ("skills", "technical skills", "competencies"),
+        "projects": ("projects", "selected projects"),
+        "certifications": ("certifications", "licenses"),
+    }
+    normalized_lines = {re.sub(r"[^a-z ]", "", line.casefold()).strip() for line in lines}
+    detected_sections = [
+        label
+        for label, aliases in heading_names.items()
+        if any(alias in normalized_lines for alias in aliases)
+    ]
+    sensitive_patterns = {
+        "date of birth": r"\b(?:date of birth|dob)\b",
+        "marital status": r"\bmarital status\b",
+        "religion": r"\breligion\b",
+        "government identifier": r"\b(?:passport|aadhaar|social security|ssn|national id)\b",
+        "full street address": r"\b(?:street|road|avenue|lane|apartment|flat)\b",
+    }
+    sensitive_categories = [
+        label for label, pattern in sensitive_patterns.items() if re.search(pattern, text, re.I)
+    ]
+    instruction_signals = len(
+        re.findall(
+            r"\b(?:ignore (?:all |the )?(?:previous|prior) instructions|system prompt|"
+            r"run (?:this )?command|upload (?:the )?file|send (?:this|the data)|"
+            r"click (?:this|the )?link)\b",
+            text,
+            re.I,
+        )
+    )
+    date_signals = len(
+        re.findall(
+            r"\b(?:19|20)\d{2}(?:[-/]\d{1,2})?(?:\s*(?:-|–|to)\s*(?:present|(?:19|20)\d{2}(?:[-/]\d{1,2})?))?\b",
+            text,
+            re.I,
+        )
+    )
+    warnings: list[str] = []
+    if not text.strip():
+        warnings.append("No selectable text was extracted; the file may be scanned.")
+    if not detected_sections and text.strip():
+        warnings.append("No standard resume section headings were confidently detected.")
+    if sensitive_categories:
+        warnings.append("Potentially sensitive categories were detected; review before reuse.")
+    if instruction_signals:
+        warnings.append(
+            "Instruction-like text was detected and will be treated only as untrusted document data."
+        )
+    return {
+        "nonEmptyLines": len(lines),
+        "detectedSections": detected_sections,
+        "dateSignals": date_signals,
+        "potentialSensitiveCategories": sensitive_categories,
+        "instructionLikeSignals": instruction_signals,
+        "warnings": warnings,
+    }
+
+
 def new_intake_session(
     journey: str,
     source: Path | None = None,
@@ -1093,6 +1551,7 @@ def new_intake_session(
     region: str = "",
     domain: str = "",
     job_description: str = "",
+    include_extracted_text: bool = False,
 ) -> dict[str, Any]:
     if journey not in {"existing-resume", "scratch"}:
         raise ValueError("journey must be existing-resume or scratch.")
@@ -1105,13 +1564,15 @@ def new_intake_session(
         extracted = extract_text(source)
         sources.append(
             {
-                "path": str(source.resolve()),
+                "path": source.name,
                 "fileName": source.name,
                 "fileType": source.suffix.lower().lstrip("."),
                 "sha256": _file_digest(source),
                 "extractedCharacters": len(extracted.strip()),
                 "textSelectable": bool(extracted.strip()),
-                "extractedText": extracted,
+                "extractedText": extracted if include_extracted_text else "",
+                "extractedTextStored": include_extracted_text,
+                "importSummary": summarize_imported_text(extracted),
                 "reviewedByUser": False,
             }
         )
@@ -1153,13 +1614,16 @@ def new_intake_session(
 
     now = _utc_now()
     session: dict[str, Any] = {
-        "version": "1.0.0",
+        "version": "1.2.0",
         "sessionId": str(uuid.uuid4()),
         "journey": journey,
         "status": "intake",
         "createdAt": now,
         "updatedAt": now,
-        "privacyNotice": "This file may contain personal data and extracted resume text. Keep it private and do not commit it to a public repository.",
+        "privacyNotice": (
+            "This session contains personal career data. Full extracted text is omitted by default. "
+            "Keep the file private, do not commit it, and check your AI platform's data controls."
+        ),
         "target": {
             "role": role,
             "region": region,
@@ -1376,6 +1840,9 @@ def intake_status_report(session: dict[str, Any]) -> dict[str, Any]:
         "progress": progress,
         "completionPercent": percent,
         "selectedDomain": session.get("target", {}).get("domain", {}),
+        "importSummaries": [
+            item.get("importSummary", {}) for item in session.get("sources", [])
+        ],
         "nextQuestions": next_intake_questions(session),
         "privacyNotice": session.get("privacyNotice"),
     }
@@ -1405,6 +1872,11 @@ def expected_anchors(record: dict[str, Any]) -> list[str]:
 
 
 def verify_document(record: dict[str, Any], document_path: Path) -> dict[str, Any]:
+    validation = validate_record(record)
+    if not validation["valid"]:
+        raise ValueError(
+            "Career record failed validation:\n- " + "\n- ".join(validation["errors"])
+        )
     expected = build_plain_text(record)
     actual = extract_text(document_path)
     expected_counter = Counter(_tokens(expected))
@@ -1423,7 +1895,7 @@ def verify_document(record: dict[str, Any], document_path: Path) -> dict[str, An
 
         extracted_pages = len(PdfReader(str(document_path)).pages)
     report = {
-        "document": str(document_path.resolve()),
+        "document": document_path.name,
         "documentType": document_path.suffix.lower().lstrip("."),
         "extractableCharacters": len(actual.strip()),
         "expectedTokenCount": expected_total,
@@ -1461,7 +1933,12 @@ def interview_markdown(record: dict[str, Any]) -> str:
         f"1. Walk me through your background and why it is relevant to {role}.",
         "   - Build a 60-90 second answer from the summary and the two most relevant recent roles.",
         "",
-        "## Requirement questions",
+        "## Screening questions",
+        "",
+        f"1. Why are you interested in {role}, and what evidence makes you a credible match?",
+        "2. What are your availability, location, and work-authorization constraints? Answer only what is lawful and relevant in your market.",
+        "",
+        "## Requirement and technical/domain questions",
         "",
     ]
     requirements = record.get("target", {}).get("requirements", [])
@@ -1485,7 +1962,20 @@ def interview_markdown(record: dict[str, Any]) -> str:
             "1. Ask for the job description, then map each major requirement to verified evidence."
         )
 
-    lines.extend(["", "## Resume deep dives", ""])
+    lines.extend(
+        [
+            "",
+            "## Behavioral questions",
+            "",
+            "1. Tell me about a difficult problem you solved with incomplete information.",
+            "2. Describe a disagreement with a stakeholder and how you handled it.",
+            "3. Tell me about a mistake or failed approach and what changed afterward.",
+            "   - Use STAR-R: Situation, Task, Action, Result, Reflection.",
+            "",
+            "## Resume deep dives",
+            "",
+        ]
+    )
     question_number = 1
     for work_index, role_item in enumerate(record.get("work", [])[:3]):
         for highlight in role_item.get("highlights", [])[:2]:
@@ -1501,6 +1991,19 @@ def interview_markdown(record: dict[str, Any]) -> str:
 
     lines.extend(
         [
+            "",
+            "## Honest gap responses",
+            "",
+            "- State the gap directly; do not imply experience you do not have.",
+            "- Connect the closest verified, transferable evidence.",
+            "- Explain a concrete learning or first-90-days plan without promising certainty.",
+            "",
+            "## Questions for the interviewer",
+            "",
+            "- What outcomes would define success in the first 90 days?",
+            "- Which problems are most urgent for this role?",
+            "- How are decisions made and work reviewed on this team?",
+            "- What distinguishes strong performers here after one year?",
             "",
             "## Reusable follow-ups",
             "",
@@ -1552,6 +2055,11 @@ def build_parser() -> argparse.ArgumentParser:
     start.add_argument("--region", default="")
     start.add_argument("--domain", default="")
     start.add_argument("--job-description", default="")
+    start.add_argument(
+        "--include-extracted-text",
+        action="store_true",
+        help="Store full extracted text in the private session file (off by default).",
+    )
 
     status = subparsers.add_parser(
         "status", help="Show intake progress and the next three questions."
@@ -1569,6 +2077,12 @@ def build_parser() -> argparse.ArgumentParser:
     validate = subparsers.add_parser("validate", help="Validate a career record.")
     validate.add_argument("record", type=Path)
     validate.add_argument("--out", type=Path)
+
+    approve = subparsers.add_parser(
+        "approve", help="Bind final wording after the candidate confirms every fact."
+    )
+    approve.add_argument("record", type=Path)
+    approve.add_argument("--out", type=Path, required=True)
 
     render = subparsers.add_parser("render", help="Render resume formats.")
     render.add_argument("record", type=Path)
@@ -1611,11 +2125,12 @@ def main(argv: list[str] | None = None) -> int:
                 region=args.region,
                 domain=args.domain,
                 job_description=args.job_description,
+                include_extracted_text=args.include_extracted_text,
             )
             _write_or_print(session, args.out)
             _write_or_print(
                 {
-                    "session": str(args.out.resolve()),
+                    "session": args.out.name,
                     "journey": session["journey"],
                     "selectedDomain": session["target"]["domain"],
                     "sourceCharacters": sum(
@@ -1639,6 +2154,17 @@ def main(argv: list[str] | None = None) -> int:
             report = validate_record(load_record(args.record))
             _write_or_print(report, args.out)
             return 0 if report["valid"] else 2
+        if args.command == "approve":
+            approved = approve_record(load_record(args.record))
+            _write_or_print(approved, args.out)
+            _write_or_print(
+                {
+                    "approvedRecord": args.out.name,
+                    "approvedClaims": len(approved["meta"]["approvedClaimDigests"]),
+                    "warning": "Use only after the candidate has reviewed and confirmed every material fact.",
+                }
+            )
+            return 0
         if args.command == "render":
             record = load_record(args.record)
             formats = [item.strip() for item in args.formats.split(",") if item.strip()]
@@ -1654,9 +2180,17 @@ def main(argv: list[str] | None = None) -> int:
             return 0 if report["pass"] else 3
         if args.command == "interview":
             _write_or_print(interview_markdown(load_record(args.record)), args.out)
-            print(str(args.out.resolve()))
+            print(args.out.name)
             return 0
-    except (OSError, ValueError, RuntimeError, json.JSONDecodeError) as exc:
+    except (
+        OSError,
+        ValueError,
+        RuntimeError,
+        TypeError,
+        AttributeError,
+        UnicodeError,
+        json.JSONDecodeError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
     return 1

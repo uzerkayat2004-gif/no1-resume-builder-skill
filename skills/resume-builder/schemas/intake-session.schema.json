@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "urn:resume-builder:intake-session:1.0.0",
+  "$id": "urn:resume-builder:intake-session:1.2.0",
   "title": "Resume Builder intake session",
   "type": "object",
   "required": [
@@ -98,6 +98,8 @@
           "extractedCharacters",
           "textSelectable",
           "extractedText",
+          "extractedTextStored",
+          "importSummary",
           "reviewedByUser"
         ],
         "additionalProperties": false,
@@ -109,6 +111,30 @@
           "extractedCharacters": {"type": "integer", "minimum": 0},
           "textSelectable": {"type": "boolean"},
           "extractedText": {"type": "string"},
+          "extractedTextStored": {"type": "boolean"},
+          "importSummary": {
+            "type": "object",
+            "required": [
+              "nonEmptyLines",
+              "detectedSections",
+              "dateSignals",
+              "potentialSensitiveCategories",
+              "instructionLikeSignals",
+              "warnings"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "nonEmptyLines": {"type": "integer", "minimum": 0},
+              "detectedSections": {"type": "array", "items": {"type": "string"}},
+              "dateSignals": {"type": "integer", "minimum": 0},
+              "potentialSensitiveCategories": {
+                "type": "array",
+                "items": {"type": "string"}
+              },
+              "instructionLikeSignals": {"type": "integer", "minimum": 0},
+              "warnings": {"type": "array", "items": {"type": "string"}}
+            }
+          },
           "reviewedByUser": {"type": "boolean"}
         }
       }

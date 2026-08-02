@@ -1,6 +1,6 @@
 # United Kingdom and Ireland profile
 
-- A4 is the default paper size.
+- If the application gives no format, offer A4 as a practical starting point and confirm it.
 - “CV” is the normal term.
 - Do not include a photo, date of birth, marital status, religion, or full street address by default.
 - Use concise reverse chronology for most private-sector roles.

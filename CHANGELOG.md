@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 — 2026-08-02
+
+- Added candidate-approval digests that block silent changes to material resume facts.
+- Forced every unverified output to display a prominent draft warning and draft filename.
+- Added an untrusted-document boundary, privacy-minimized intake sessions, and import summaries.
+- Added file-size, PDF-page, extracted-text, DOCX archive, macro, and embedded-object limits.
+- Pinned patched dependencies, added dependency auditing and Dependabot, and pinned CI actions.
+- Removed document timestamps/revision metadata and expanded evidence-linked interview practice.
+- Expanded the automated adversarial and rendering suite from 10 to 19 tests.
+
 ## 1.1.0 — 2026-08-02
 
 - Published the GitHub wrapper as “No. 1 Resume Builder Skill.”
