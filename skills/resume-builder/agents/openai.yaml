@@ -1,0 +1,4 @@
+interface:
+  display_name: "No. 1 Resume Builder Skill"
+  short_description: "Build truthful, job-ready resumes across domains"
+  default_prompt: "Use $resume-builder to build or improve my resume from an uploaded resume or from scratch, then prepare me for interviews from verified evidence."

@@ -1,0 +1,272 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:resume-builder:career-record:1.0.0",
+  "title": "Evidence-backed career record",
+  "type": "object",
+  "required": ["basics", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "basics": {
+      "type": "object",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "label": {"type": "string"},
+        "email": {"type": "string"},
+        "phone": {"type": "string"},
+        "location": {"type": "string"},
+        "url": {"type": "string"},
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["network", "url"],
+            "additionalProperties": false,
+            "properties": {
+              "network": {"type": "string"},
+              "url": {"type": "string"}
+            }
+          }
+        },
+        "summary": {"type": "string"},
+        "summaryClaimIds": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "keywords"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "keywords": {
+            "type": "array",
+            "items": {"type": "string"}
+          },
+          "claimIds": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "work": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/experienceEntry"}
+    },
+    "projects": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/projectEntry"}
+    },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["institution", "area"],
+        "additionalProperties": false,
+        "properties": {
+          "institution": {"type": "string"},
+          "area": {"type": "string"},
+          "studyType": {"type": "string"},
+          "location": {"type": "string"},
+          "startDate": {"$ref": "#/$defs/date"},
+          "endDate": {"$ref": "#/$defs/date"},
+          "score": {"type": "string"},
+          "highlights": {
+            "type": "array",
+            "items": {"$ref": "#/$defs/claimText"}
+          },
+          "claimIds": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "certificates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "issuer"],
+        "additionalProperties": false,
+        "properties": {
+          "name": {"type": "string"},
+          "issuer": {"type": "string"},
+          "date": {"$ref": "#/$defs/date"},
+          "url": {"type": "string"},
+          "claimIds": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "awards": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "additionalProperties": false,
+        "properties": {
+          "title": {"type": "string"},
+          "awarder": {"type": "string"},
+          "date": {"$ref": "#/$defs/date"},
+          "summary": {"type": "string"},
+          "claimIds": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["language"],
+        "additionalProperties": false,
+        "properties": {
+          "language": {"type": "string"},
+          "fluency": {"type": "string"},
+          "claimIds": {
+            "type": "array",
+            "items": {"type": "string"}
+          }
+        }
+      }
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "claim", "sourceType", "sourceStatus"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {"type": "string", "pattern": "^[A-Za-z0-9._-]+$"},
+          "claim": {"type": "string", "minLength": 1},
+          "sourceType": {
+            "enum": [
+              "user-statement",
+              "uploaded-resume",
+              "portfolio",
+              "transcript",
+              "certificate",
+              "user-provided-profile",
+              "other"
+            ]
+          },
+          "sourceStatus": {
+            "enum": ["verified", "user-confirmed", "unverified"]
+          },
+          "sourceNote": {"type": "string"},
+          "sensitive": {"type": "boolean"}
+        }
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "role": {"type": "string"},
+        "level": {"type": "string"},
+        "company": {"type": "string"},
+        "jobDescription": {"type": "string"},
+        "requirements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["text", "status"],
+            "additionalProperties": false,
+            "properties": {
+              "text": {"type": "string"},
+              "status": {
+                "enum": ["supported", "transferable", "unsupported", "unclear"]
+              },
+              "claimIds": {
+                "type": "array",
+                "items": {"type": "string"}
+              }
+            }
+          }
+        }
+      }
+    },
+    "meta": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "language": {"type": "string"},
+        "region": {"type": "string"},
+        "paperSize": {"enum": ["letter", "a4"]},
+        "allowUnverified": {"type": "boolean"},
+        "version": {"type": "string"},
+        "lastModified": {"type": "string"}
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^(present|[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?)?$"
+    },
+    "claimText": {
+      "type": "object",
+      "required": ["text", "claimIds"],
+      "additionalProperties": false,
+      "properties": {
+        "text": {"type": "string", "minLength": 1},
+        "claimIds": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "experienceEntry": {
+      "type": "object",
+      "required": ["name", "position", "startDate", "highlights"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "position": {"type": "string"},
+        "location": {"type": "string"},
+        "startDate": {"$ref": "#/$defs/date"},
+        "endDate": {"$ref": "#/$defs/date"},
+        "summary": {"type": "string"},
+        "claimIds": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "highlights": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/claimText"}
+        }
+      }
+    },
+    "projectEntry": {
+      "type": "object",
+      "required": ["name", "highlights"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "url": {"type": "string"},
+        "startDate": {"$ref": "#/$defs/date"},
+        "endDate": {"$ref": "#/$defs/date"},
+        "claimIds": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "highlights": {
+          "type": "array",
+          "items": {"$ref": "#/$defs/claimText"}
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,93 @@
+{
+  "skill_name": "resume-builder",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "I am a final-year engineering student in Pune. Build my first resume from these notes, but do not invent metrics. I know Java, Python, SQL, made a hostel maintenance ticketing project with three classmates, completed a six-week internship, and want an entry-level backend role. Ask only the questions needed to verify facts, then create DOCX and PDF.",
+      "expected_output": "A concise early-career resume plus a fact-check list, evidence record, editable DOCX, selectable PDF, and extraction report. No invented users, percentages, or business impact.",
+      "files": [],
+      "assertions": [
+        "No unsupported metric or employer claim appears.",
+        "The output uses a one-column structure with standard headings.",
+        "DOCX and PDF text extraction preserve the material content."
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Tailor my attached senior operations resume to this program director posting. The posting asks for a $10M budget, but my verified maximum budget is $4.2M. Keep that gap honest, map every major requirement, and create interview questions from the final evidence.",
+      "expected_output": "A truthful targeted variant that retains the verified $4.2M scope, marks the $10M requirement as a gap or transferable evidence, and produces evidence-linked interview practice.",
+      "files": [],
+      "assertions": [
+        "The resume never changes $4.2M to $10M.",
+        "Unsupported requirements are visible in the requirement matrix.",
+        "Interview answers cite verified resume evidence."
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Audit this visually fancy two-column PDF for ATS readability. Do not rewrite it yet. Tell me exactly what extracted, what was missing or out of order, and whether I should submit PDF or DOCX for the Greenhouse application instructions I pasted.",
+      "expected_output": "A diagnostic extraction report rather than a made-up ATS score, with the employer instructions controlling the format recommendation.",
+      "files": [],
+      "assertions": [
+        "No predictive ATS score is given.",
+        "The report distinguishes observable extraction from uncertain vendor behavior.",
+        "The pasted application instructions override generic file advice."
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Create an academic CV for a postdoctoral application in Germany from my publications, teaching, grants, and research history. The university requests Europass-compatible information and explicitly asks for a photo.",
+      "expected_output": "An academic-CV workflow that follows the institution's explicit request, applies European context cautiously, and does not force a private-sector two-page limit.",
+      "files": [],
+      "assertions": [
+        "The academic CV is not forced into one or two pages.",
+        "The explicit photo request is surfaced for informed confirmation.",
+        "Private-sector ATS conventions are not treated as universal."
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Start my resume from scratch. I am a registered nurse moving from a medical-surgical unit to emergency care. I am not sure which details matter, so guide me in short rounds and let me skip questions I cannot answer yet.",
+      "expected_output": "A resumable scratch intake routed to the clinical-healthcare domain, with no more than three questions per round and prompts for licensure, patient setting, clinical scope, safety, collaboration, and outcomes.",
+      "files": [],
+      "assertions": [
+        "The first response asks no more than three questions.",
+        "The workflow distinguishes licensure from ordinary skills.",
+        "Unknown details remain open rather than being invented."
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Use my old electrician resume as the starting point. First show what you could extract, what is uncertain, and what you propose to preserve. I am applying for an industrial maintenance electrician role.",
+      "expected_output": "A source-preserving import workflow routed to the construction-trades-field-service domain, with an extraction report and confirmation before claims are rewritten.",
+      "files": [],
+      "assertions": [
+        "The uploaded source is never overwritten.",
+        "Licenses, safety training, systems, environments, and verified scope are prioritized.",
+        "The candidate is asked to resolve uncertain extraction before finalization."
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Build a resume for a hotel front-desk supervisor applying to guest-services manager roles. I have experience with shift coverage, guest complaints, reservations, and training new hires, but I do not have reliable percentages.",
+      "expected_output": "A service-and-hospitality resume that uses verified scope and examples without fabricating satisfaction, revenue, or efficiency metrics.",
+      "files": [],
+      "assertions": [
+        "The domain router selects retail-hospitality-service or explains a close alternative.",
+        "The draft can use counts, frequency, complexity, and examples when percentages are unavailable.",
+        "Guest recovery and team leadership evidence are visible."
+      ]
+    },
+    {
+      "id": 8,
+      "prompt": "I work in a niche occupation that is not listed in your domain catalog. Help me create a resume from scratch without forcing me into the wrong industry template.",
+      "expected_output": "A general evidence-first fallback that asks about audience, outputs, constraints, tools, stakeholders, and outcomes, then allows the candidate to correct the inferred domain.",
+      "files": [],
+      "assertions": [
+        "The workflow falls back to general rather than claiming a false match.",
+        "The candidate can override the router.",
+        "The resume is still evidence-based and target-specific."
+      ]
+    }
+  ]
+}

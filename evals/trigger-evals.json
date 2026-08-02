@@ -1,0 +1,62 @@
+[
+  {
+    "query": "Can you rewrite my CV for this data engineer vacancy and export a clean Word and PDF version?",
+    "should_trigger": true
+  },
+  {
+    "query": "My resume keeps getting rejected. Audit the PDF text extraction and tell me what to fix.",
+    "should_trigger": true
+  },
+  {
+    "query": "Turn my LinkedIn notes and project list into a truthful graduate resume; please don't make up numbers.",
+    "should_trigger": true
+  },
+  {
+    "query": "Help me prepare behavioral interviews using only stories supported by my resume.",
+    "should_trigger": true
+  },
+  {
+    "query": "Tailor this federal resume to a USAJOBS announcement and respect the announcement's document rules.",
+    "should_trigger": true
+  },
+  {
+    "query": "I need a German academic CV from my papers and teaching record.",
+    "should_trigger": true
+  },
+  {
+    "query": "Start from scratch and interview me in short rounds for a registered nurse resume.",
+    "should_trigger": true
+  },
+  {
+    "query": "Import my old electrician resume, preserve its facts, and tailor a verified version for industrial maintenance.",
+    "should_trigger": true
+  },
+  {
+    "query": "Make a hotel guest-services resume even though I do not have percentage metrics.",
+    "should_trigger": true
+  },
+  {
+    "query": "Write a cover letter for this role; my resume is attached only for background.",
+    "should_trigger": false
+  },
+  {
+    "query": "Build a web application where customers can design resumes with drag-and-drop templates.",
+    "should_trigger": false
+  },
+  {
+    "query": "Parse 50,000 resumes into our recruiting database and rank the applicants.",
+    "should_trigger": false
+  },
+  {
+    "query": "Translate this already-final resume from English to French without changing the layout.",
+    "should_trigger": false
+  },
+  {
+    "query": "Design a hiring-manager interview scorecard for evaluating candidates.",
+    "should_trigger": false
+  },
+  {
+    "query": "Research the history of the curriculum vitae in Renaissance Europe.",
+    "should_trigger": false
+  }
+]
