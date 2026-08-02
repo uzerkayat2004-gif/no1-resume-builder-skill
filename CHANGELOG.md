@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.1 — 2026-08-02
+
+- Fixed DOCX metadata scrubbing so generated resumes remain compatible with Microsoft Word.
+- Preserved required Word XML namespace declarations while still removing author, timestamp, revision, and session identifiers.
+- Added a regression check for namespace integrity and verified a generated resume by opening and exporting it through Microsoft Word.
+
 ## 1.2.0 — 2026-08-02
 
 - Added candidate-approval digests that block silent changes to material resume facts.

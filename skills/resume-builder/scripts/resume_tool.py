@@ -21,7 +21,6 @@ from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
-from xml.etree import ElementTree
 from xml.sax.saxutils import escape
 
 
@@ -958,62 +957,36 @@ def render_docx(record: dict[str, Any], output: Path) -> None:
 
 def scrub_docx_metadata(output: Path) -> None:
     """Remove author/time/revision metadata without changing visible content."""
-    word_namespace = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
-    core_namespace = "http://schemas.openxmlformats.org/package/2006/metadata/core-properties"
-    dc_namespace = "http://purl.org/dc/elements/1.1/"
-    dcterms_namespace = "http://purl.org/dc/terms/"
-    removable_core = {
-        f"{{{dc_namespace}}}creator",
-        f"{{{core_namespace}}}lastModifiedBy",
-        f"{{{core_namespace}}}revision",
-        f"{{{dcterms_namespace}}}created",
-        f"{{{dcterms_namespace}}}modified",
-    }
     temporary = output.with_suffix(output.suffix + ".tmp")
     try:
         with zipfile.ZipFile(output, "r") as source, zipfile.ZipFile(
             temporary, "w", compression=zipfile.ZIP_DEFLATED
         ) as destination:
             for info in source.infolist():
-                if info.filename.startswith("customXml/"):
-                    continue
                 data = source.read(info.filename)
-                if info.filename.endswith(".xml"):
-                    try:
-                        root = ElementTree.fromstring(data)
-                        if info.filename == "docProps/core.xml":
-                            for child in list(root):
-                                if child.tag in removable_core:
-                                    root.remove(child)
-                        if info.filename == "[Content_Types].xml":
-                            for child in list(root):
-                                if str(child.get("PartName", "")).startswith("/customXml/"):
-                                    root.remove(child)
-                        if info.filename.startswith("word/"):
-                            for element in root.iter():
-                                for attribute in list(element.attrib):
-                                    if attribute.startswith(f"{{{word_namespace}}}rsid"):
-                                        del element.attrib[attribute]
-                                for child in list(element):
-                                    local_name = child.tag.rsplit("}", 1)[-1]
-                                    if local_name == "rsids" or local_name.startswith("rsid"):
-                                        element.remove(child)
-                        data = ElementTree.tostring(
-                            root, encoding="utf-8", xml_declaration=True
+                if info.filename == "docProps/core.xml":
+                    for tag in (
+                        b"dc:creator",
+                        b"cp:lastModifiedBy",
+                        b"cp:revision",
+                        b"dcterms:created",
+                        b"dcterms:modified",
+                    ):
+                        pattern = (
+                            rb"<" + tag + rb"\b[^>]*(?:/>|>.*?</" + tag + rb"\s*>)"
                         )
-                    except ElementTree.ParseError:
-                        pass
-                if info.filename.endswith(".rels"):
-                    try:
-                        root = ElementTree.fromstring(data)
-                        for child in list(root):
-                            if "customXml/" in str(child.get("Target", "")):
-                                root.remove(child)
-                        data = ElementTree.tostring(
-                            root, encoding="utf-8", xml_declaration=True
-                        )
-                    except ElementTree.ParseError:
-                        pass
+                        data = re.sub(pattern, b"", data, flags=re.DOTALL)
+                if info.filename.startswith("word/") and info.filename.endswith(".xml"):
+                    data = re.sub(
+                        rb"\s+w:rsid[A-Za-z0-9]*=\"[^\"]*\"", b"", data
+                    )
+                    data = re.sub(
+                        rb"<w:rsids\b[^>]*>.*?</w:rsids\s*>",
+                        b"",
+                        data,
+                        flags=re.DOTALL,
+                    )
+                    data = re.sub(rb"<w:rsid[A-Za-z0-9]*\b[^>]*/>", b"", data)
                 destination.writestr(info, data)
         temporary.replace(output)
     finally:

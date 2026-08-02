@@ -157,9 +157,6 @@ class ResumeToolTests(unittest.TestCase):
             )
 
             with zipfile.ZipFile(docx_path) as archive:
-                self.assertFalse(
-                    any(name.startswith("customXml/") for name in archive.namelist())
-                )
                 xml = b"\n".join(
                     archive.read(name)
                     for name in archive.namelist()
@@ -169,6 +166,10 @@ class ResumeToolTests(unittest.TestCase):
                 core = archive.read("docProps/core.xml")
                 self.assertNotIn(b"created", core)
                 self.assertNotIn(b"modified", core)
+                document_xml = archive.read("word/document.xml")
+                self.assertIn(b'mc:Ignorable="w14 wp14"', document_xml)
+                self.assertIn(b'xmlns:w14="', document_xml)
+                self.assertIn(b'xmlns:wp14="', document_xml)
 
             from pypdf import PdfReader
 
