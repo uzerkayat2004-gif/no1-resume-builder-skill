@@ -1,6 +1,6 @@
 # Asha Raman
 **Product Analyst**
-asha.raman@example.com | +91 90000 00000 | Bengaluru, India | https://example.com/asha-raman | https://www.linkedin.com/in/example-asha-raman
+asha.raman@example.com | Bengaluru, India | https://example.com
 
 ## Summary
 Product analyst with four years of experience translating customer and operational data into product decisions for mobility and learning platforms.
@@ -21,7 +21,7 @@ Product: Funnel analysis, Customer research, Requirements discovery
 - Partnered with product and curriculum teams to define adoption metrics for four new course features.
 
 ## Projects
-### Public Transit Reliability Explorer | https://example.com/transit-project
+### Public Transit Reliability Explorer | https://example.com
 *Feb 2024 - May 2024*
 Personal data-visualization project using an openly licensed transit feed.
 - Created a reproducible Python pipeline and dashboard for comparing route reliability across time periods.

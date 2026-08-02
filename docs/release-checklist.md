@@ -29,10 +29,22 @@
 ## Factuality and privacy
 
 - Unsupported and unverified claims block final rendering.
+- Candidate approval digests block material wording drift.
+- Unverified drafts are visibly marked in every format and filename.
 - Numeric details require cited evidence.
 - Sensitive data is excluded by default.
+- Imported content is treated as untrusted data, never instructions.
+- Full extracted text and absolute source paths are omitted by default.
 - No real candidate fixtures are committed.
 - Intake sessions are ignored by git.
+
+## Security
+
+- Direct runtime dependencies are pinned and `pip-audit` reports no known vulnerabilities.
+- DOCX/PDF/TXT/Markdown inputs enforce size and complexity limits.
+- DOCX macros, embedded objects, unsafe paths, and suspicious archives are rejected.
+- GitHub Actions use immutable commit pins and least-privilege permissions.
+- Dependabot, vulnerability alerts, security updates, secret scanning, push protection, and private vulnerability reporting are enabled.
 
 ## Documents
 
@@ -42,6 +54,7 @@
 - PDF text is selectable.
 - Round-trip recall meets the release threshold.
 - Every page is visually inspected.
+- Generated DOCX/PDF metadata contains no personal author or timestamp fields.
 
 ## Repository
 

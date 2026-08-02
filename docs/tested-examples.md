@@ -1,6 +1,6 @@
-# Tested examples
+# Scenario expectations and tested checks
 
-These examples are synthetic evaluation scenarios. They test behavior and failure prevention; they are not testimonials or claims that a real person received an interview.
+These are synthetic evaluation scenarios plus automated checks. Each scenario states expected behavior; only items explicitly described as automated are executed in CI. They are not testimonials or claims that a real person received an interview.
 
 ## 1. Registered nurse starting from scratch
 
@@ -123,7 +123,7 @@ Results:
 
 - one-page DOCX and PDF passed visual review;
 - no layout table appears in the DOCX;
-- both files preserved all 205 expected material tokens;
+- both files preserved all 200 expected material tokens;
 - the unsupported marketplace-pricing requirement remained visible.
 
 See [the rendered example](../examples/product-analyst/README.md).

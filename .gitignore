@@ -6,7 +6,12 @@ build/
 dist/
 *.tmp
 session.json
+*session*.json
 *.intake.json
+*.career-record.json
+*.resume-record.json
+career-record.json
+resume-record.json
 private/
 candidate-data/
 rendered-resumes/

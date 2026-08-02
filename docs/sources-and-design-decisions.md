@@ -245,7 +245,7 @@ Source: https://github.com/AmruthPillai/Reactive-Resume
 
 Lesson: privacy, self-hosting, ownership, structured import/export and multiple formats matter.
 
-Implementation: local-first helpers, no uploads, and reusable structured data.
+Implementation: a network-free helper, minimal saved intake data, explicit AI-host disclosure, and reusable structured data.
 
 ### OpenResume
 

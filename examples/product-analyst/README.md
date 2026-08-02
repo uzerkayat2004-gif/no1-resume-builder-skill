@@ -16,6 +16,6 @@ Verification:
 
 - DOCX and PDF each render as one page;
 - both were visually inspected;
-- both preserved all 205 expected material tokens during extraction;
+- both preserved all 200 expected material tokens during extraction;
 - the DOCX uses paragraphs and real list items rather than a layout table;
 - the target's unsupported marketplace-pricing requirement remains visible in the underlying career record instead of being fabricated into the resume.
